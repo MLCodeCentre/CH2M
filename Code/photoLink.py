@@ -59,8 +59,8 @@ def main(args):
         for photo in photo_files:
             print(photo)
             showImage(photo)
-        
-        
+            topdown = topDownView(photo)
+                
     
 if __name__ == '__main__':
 
