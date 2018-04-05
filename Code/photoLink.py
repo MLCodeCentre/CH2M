@@ -58,9 +58,10 @@ def main(args):
         photo_files = getPhotoFiles(road, year, cameras, x_target, y_target, distance)
         for photo in photo_files:
             print(photo)
-            showImage(photo)
-        
-        
+            #showImage(photo)
+            top_down = topDownView(photo)
+            showImage(top_down)
+                
     
 if __name__ == '__main__':
 
@@ -70,6 +71,6 @@ if __name__ == '__main__':
     parser.add_argument('--road', '-r', type=str, help='the time thresholding in processing', default='A27')
     parser.add_argument('--years', '-y', type=str, nargs='+', help='Yhe year label', default=['Year1'])
     parser.add_argument('--cameras', '-c', type=str, nargs='+', help='index of the channel in data array', default=['1','2','3','4'])
-    parser.add_argument('--distance', '-d', type=int, nargs=1, default=10) 
+    parser.add_argument('--distance', '-d', type=int, nargs=1, default=1) 
     args = parser.parse_args()
     main(args)

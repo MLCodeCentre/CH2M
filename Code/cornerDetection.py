@@ -3,7 +3,6 @@ import numpy as np
 import os
 from rootDir import rootDir  
 import glob
-import imutils
 from matplotlib import pyplot as plt
 import pytesseract
 from PIL import Image, ImageEnhance, ImageFilter
@@ -57,7 +56,7 @@ def match(image, match_image='lampost'):
     plt.imshow(img3),plt.show()
   
 def getText(image):
-    pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files (x86)\\Tesseract-OCR\\tesseract'
+
     im = Image.open(image) # the second one 
     im = im.filter(ImageFilter.MedianFilter())
     enhancer = ImageEnhance.Contrast(im)
@@ -76,7 +75,7 @@ def main():
     #files_dir1 = glob.glob(dir1)
     #print(files_dir1)
     #pot_hole_file = os.path.join(rootDir(),'Data', road, Year2, 'Images','4_1307_5027.jpeg')
-    images = ['4_1310_{}.jpg'.format(str(i)) for i in range(3558, 3700)]
+    images = ['1_1307_{}.jpg'.format(str(i)) for i in range(1006, 3700)]
     images = [os.path.join(rootDir(),'Data', road, Year1,'Images',image) for image in images]
 
     for ind, image in enumerate(images):
