@@ -1,5 +1,5 @@
 import os
 
 def rootDir():
-    return 'C:\\Users\\ts1454\\CH2M'
+    return '/home/tom/PhD/CH2M/'
 	

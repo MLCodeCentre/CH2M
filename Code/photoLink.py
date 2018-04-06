@@ -13,6 +13,7 @@ def getNavData(road, year):
     nav_data = DBF(nav_file)
     nav_data = pd.DataFrame(iter(nav_data))
     nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
+    print(nav_data.tail(200))
     return nav_data
     
 
@@ -58,7 +59,7 @@ def main(args):
         photo_files = getPhotoFiles(road, year, cameras, x_target, y_target, distance)
         for photo in photo_files:
             print(photo)
-            #showImage(photo)
+            showImage(photo)
             top_down = topDownView(photo)
             showImage(top_down)
                 
