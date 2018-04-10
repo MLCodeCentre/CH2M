@@ -33,6 +33,7 @@ def getPhotoFilesFromFile(file, road, year, cameras, distance):
     photo_files = []
     
     x_target, y_target = getFileTarget(file, road, year)
+    print('photo target is {:f}, {:f}'.format(x_target, y_target))
     if x_target != 0 and y_target != 0:
         photo_files = getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance)
     
@@ -60,11 +61,10 @@ def main(args):
     print(photo_files)
     for (photo, road, year, camera, XCOORD, YCOORD) in photo_files:
         print('{} [{}, {}], {}, camera {}'.format(road, XCOORD, YCOORD, year, camera))
-        showImage(photo)
+        #showImage(photo)
         if int(camera) in [2,4]:
             top_down = topDownView(photo)
-            showImage(top_down)
-                
+                           
     
 if __name__ == '__main__':
 
