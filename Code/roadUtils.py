@@ -1,20 +1,19 @@
 import cv2
 import numpy as np
 
+
 def extendLine(line, y1_target, y2_target):
-   
+
     x1, y1, x2, y2 = line
-    alpha = np.arctan((y1-y2)/(x1-x2 + 0.1))
+    alpha = np.arctan((y1-y2)/(x1-x2))
     
     if y1_target > y1:
-    
         r = (y1_target-y1) / np.sin(alpha)
         dx = r * np.cos(alpha)
         x1 = int(x1 + dx)
         y1 = y1_target
                 
     if y2_target < y2:
-
         r = (y2_target-y2) / np.sin(alpha)
         dx = r * np.cos(alpha)
         x2 = int(x2 + dx)
