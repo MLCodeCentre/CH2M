@@ -5,29 +5,8 @@ import numpy as np
 import glob
 from imageProcessing import *
 import argparse
-<<<<<<< HEAD
-
-def getNavData(road, year):
-    
-    nav_file = os.path.join(rootDir(),'Data',road,year,'Nav','{}.dbf'.format(road))
-    nav_data = DBF(nav_file)
-    nav_data = pd.DataFrame(iter(nav_data))
-    nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
-    print(nav_data.tail(200))
-    return nav_data
-    
-
-def getNavDataInThresh(nav_data, x_target, y_target, distance):
-
-    x_dist = (nav_data['XCOORD'] - x_target)*(nav_data['XCOORD'] - x_target)
-    y_dist = (nav_data['YCOORD'] - y_target)*(nav_data['YCOORD'] - y_target)
-    norm = np.sqrt(x_dist + y_dist)
-    nav_data_thresh = nav_data[norm < distance]
-    return nav_data_thresh
-=======
 from navFiles import *
       
->>>>>>> ed569907b1a74192a14aa3b1dd3eceea2732831b
         
 def getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance):
     
@@ -78,19 +57,11 @@ def main(args):
         print('No target or file specified')
         sys.exit()
     
-<<<<<<< HEAD
-    for year in years:
-        photo_files = getPhotoFiles(road, year, cameras, x_target, y_target, distance)
-        for photo in photo_files:
-            print(photo)
-            showImage(photo)
-=======
     print(photo_files)
     for (photo, road, year, camera, XCOORD, YCOORD) in photo_files:
         print('{} [{}, {}], {}, camera {}'.format(road, XCOORD, YCOORD, year, camera))
-        showImage(photo)
+        #showImage(photo)
         if int(camera) in [2,4]:
->>>>>>> ed569907b1a74192a14aa3b1dd3eceea2732831b
             top_down = topDownView(photo)
             showImage(top_down)
                 
