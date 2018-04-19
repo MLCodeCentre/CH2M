@@ -1,66 +1,19 @@
 import cv2
 import numpy as np
 from roadUtils import *
-from matplotlib import pyplot as plt
 import os
-from rootDir import rootDir
-
-
-def showMultiWindow4(img1, img2, surface_img1, surface_img2, road, file_name, gif):
-    
-    if gif:
-        gif_image_dir = os.path.join(rootDir(),'Gifs',road)
-        if not os.path.exists(gif_image_dir):
-            os.makedirs(gif_image_dir)
-    try:
-        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
-        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-        surface_img1 = cv2.cvtColor(surface_img1, cv2.COLOR_BGR2RGB)
-        surface_img2 = cv2.cvtColor(surface_img2, cv2.COLOR_BGR2RGB)
-    except:
-        print("Caught OpenCV error!")
-    
-    plt.subplot(2,2,1), plt.imshow(img1), plt.title('Year1'), plt.axis('off')
-    plt.subplot(2,2,2), plt.imshow(img2), plt.title('Year2'), plt.axis('off')
-    plt.subplot(2,2,3), plt.imshow(surface_img1), plt.axis('off')
-    plt.subplot(2,2,4), plt.imshow(surface_img2), plt.axis('off') 
-        
-    if gif:
-        out_file = os.path.join(gif_image_dir, file_name)
-        plt.savefig(out_file)
-    else:
-        plt.show()
-
-        
-def showMultiWindow2(img1, img2):
-
-    img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
-    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
-    plt.subplot(1,2,1), plt.imshow(img1), plt.title('Year1'), plt.axis('off')
-    plt.subplot(1,2,2), plt.imshow(img2), plt.title('Year2'), plt.axis('off')
-    plt.show()    
-
-    
-def showImage(file):
-
-    if type(file)==str:
-        img = cv2.imread(file,1)
-        img = cv2.resize(img, (0,0), fx=0.25, fy=0.25)
-    else:
-        img = file
-
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    
-def topDownView(file):
+from rootDir import rootDir, dataDir
+   
+   
+def topDownView(file, auto_detection):
     
     img = cv2.imread(file,1)
     img = cv2.resize(img, (0,0), fx=0.25, fy=0.25)
     
-    #[height, width, img_points, points, reference_points] = getRoadPoints(img_points)
-    [height, width, img, points, reference_points] = autoRoadPoints(img)
+    if auto_detection:
+        [height, width, img, points, reference_points] = autoRoadPoints(img)
+    else:
+        [height, width, img, points, reference_points] = manualRoadPoints(img)
     
     top_down = np.zeros(img.shape)
     
@@ -69,6 +22,44 @@ def topDownView(file):
         top_down = cv2.warpPerspective(img, M, (width, height))
         #showImage(top_down)
     return top_down, img
+    
+
+def manualRoadPoints(img):
+    
+    height = img.shape[0]
+    width = img.shape[1]
+    gray_image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # points at the bottom of the screen
+    centre = int(width/2)
+    start_dist = 180
+  
+    (x1, y1) = (centre - start_dist, height-5)
+    (x2, y1) = (centre + start_dist, height-5)
+    
+    # points at the top of the screen
+    alpha = 35
+    alpha = np.deg2rad(alpha)
+    top = 150;
+    
+    x_diff = top*np.tan(alpha)
+    
+    (x3, y2) = (int(x1+x_diff), y1-top)
+    (x4, y2) = (int(x2-x_diff), y1-top)
+    
+    #cv2.line(img, (x1,y1), (x3,y2), (0, 255, 0), 2)
+    #cv2.line(img, (x2,y1), (x4,y2), (0, 255, 0), 2)
+    
+    tl = (x3, y2)
+    tr = (x4, y2)
+    bl = (x2, y1)
+    br = (x1, y1)
+        
+    points = np.array([tl, tr, br, bl], dtype=np.float32)
+    reference_points = np.array([[0,0], [width,0], [0,height], [width,height]], dtype=np.float32)
+    
+    return height, width, img, points, reference_points  
+    
     
 def autoRoadPoints(img):
     
@@ -108,6 +99,7 @@ def autoRoadPoints(img):
     lines = cv2.HoughLinesP(canny_edges,4,np.pi/180,30, np.array([]), minLineLength=10, maxLineGap=150)
     
     if lines is None:
+        
         bl = (0, 0) 
         tl = (0, 0)
         br = (0, 0)
@@ -155,8 +147,12 @@ def autoRoadPoints(img):
         tl = (lx2_ext, ly2_ext)
         br = (rx1_ext, ry1_ext)
         tr = (rx2_ext, ry2_ext)
-    
-   
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(img,'TL',tl,font,1,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(img,'TR',tr,font,1,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(img,'BL',bl,font,1,(255,255,255),2,cv2.LINE_AA)
+        cv2.putText(img,'BR',br,font,1,(255,255,255),2,cv2.LINE_AA)
+       
     points = np.array([tl, tr, bl, br], dtype=np.float32)
     reference_points = np.array([[0,0], [width,0], [0,height], [width,height]], dtype=np.float32)
     
