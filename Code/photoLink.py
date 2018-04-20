@@ -6,6 +6,17 @@ import glob
 from imageProcessing import *
 import argparse
 from navFiles import *
+from makeGIF import createGIF
+
+   
+def getNearestPhoto(photos, x_target, y_target):
+
+    x_dist = (photos['XCOORD'] - x_target)*(photos['XCOORD'] - x_target)
+    y_dist = (photos['YCOORD'] - y_target)*(photos['YCOORD'] - y_target)
+    norm = np.sqrt(x_dist + y_dist)
+    nearest_photo = photos.iloc[norm.idxmin()]
+    
+    return nearest_photo
       
         
 def getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance):
@@ -28,15 +39,23 @@ def getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance):
     return photo_files
 
 
-def getPhotoFilesFromFile(file, road, year, cameras, distance):
+def getPhotoFilesFromFile(file, road, years, cameras, distance):
     
     photo_files = []
+    x_target = 0 
+    y_target = 0
+    for year in years:
+        if x_target == 0 and y_target == 0:
+            x_target, y_target = getFileTarget(file, road, year)
+        
+    print('photo target is {:f}, {:f}'.format(x_target, y_target))
     
-    x_target, y_target = getFileTarget(file, road, year)
     if x_target != 0 and y_target != 0:
-        photo_files = getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance)
-    
-    return photo_files
+        for year in years:
+            photo_files_year = getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance)
+            photo_files.extend(photo_files_year)
+        
+    return photo_files, x_target, y_target
      
      
 def main(args):
@@ -50,21 +69,37 @@ def main(args):
             photo_files.extend(photos)
     
     elif len(args.file) > 0:  
-        for year in args.years:
-            photos = getPhotoFilesFromFile(args.file, args.road, year, args.cameras, args.distance)
+            [photos, x_target, y_target] = getPhotoFilesFromFile(args.file, args.road, args.years, args.cameras, args.distance)
             photo_files.extend(photos)
     else:
         print('No target or file specified')
         sys.exit()
     
-    print(photo_files)
-    for (photo, road, year, camera, XCOORD, YCOORD) in photo_files:
-        print('{} [{}, {}], {}, camera {}'.format(road, XCOORD, YCOORD, year, camera))
-        #showImage(photo)
-        if int(camera) in [2,4]:
-            top_down = topDownView(photo)
-            showImage(top_down)
-                
+    photo_df = pd.DataFrame(photo_files)
+    photo_df.columns = ['file', 'road', 'year', 'camera', 'XCOORD', 'YCOORD']
+    
+    year1_photos = photo_df[photo_df['year']=='Year1']
+    year1_photos = year1_photos.reset_index()
+    year2_photos = photo_df[photo_df['year']=='Year2']
+    year2_photos = year2_photos.reset_index()
+    
+    print('There are {:d} photos in Year {}'.format(len(year1_photos), '1'))
+    print('There are {:d} photos in Year {}'.format(len(year2_photos), '2'))  
+    
+    for ind, photo in year1_photos.iterrows():
+        nearest_photo = getNearestPhoto(year2_photos, photo.XCOORD, photo.YCOORD)
+        for camera in args.cameras:
+            if int(photo.camera) in [2,4]:
+                top_down, road_img = topDownView(photo['file'])
+                top_down_neareast, road_img_nearest = topDownView(nearest_photo['file'])
+                if args.surface:
+                    showMultiWindow4(road_img, road_img_nearest, top_down, top_down_neareast, args.road, photo['file'].split('\\')[-1], args.gif)
+                else:
+                    showMultiWindow2(road_img, road_img_nearest)
+    
+    if args.gif:
+        createGIF(args.road, str(x_target), str(y_target))
+
     
 if __name__ == '__main__':
 
@@ -75,6 +110,8 @@ if __name__ == '__main__':
     parser.add_argument('--years', '-y', type=str, nargs='+', help='The year label', default=['Year1','Year2'])
     parser.add_argument('--cameras', '-c', type=str, nargs='+', help='index of the channel in data array', default=['1','2','3','4'])
     parser.add_argument('--distance', '-d', type=int, nargs=1, default=1)
+    parser.add_argument('--surface',  type=str, const=True, nargs='?', help="show image of road surface.")
+    parser.add_argument('--gif',  type=str, const=True, nargs='?', help="create gif")
     
     args = parser.parse_args()
     
