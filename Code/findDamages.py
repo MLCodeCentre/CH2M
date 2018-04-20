@@ -5,7 +5,9 @@ import numpy as np
 from progress.bar import Bar
 from matplotlib import pyplot as plt
 from rootDir import rootDir, dataDir
-from imageProcessing import topDownView
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+from matplotlib import cm
 
 
 def findDifference(surface1, surface2):
@@ -16,23 +18,59 @@ def findDifference(surface1, surface2):
     height = gray1.shape[0]
     width = gray1.shape[1]
     
-    # only consider pixels within these ranges    
-    minValue = 10
-    maxValue = 200
-    mask1 = cv2.inRange(gray1, minValue, maxValue)
-    mask2 = cv2.inRange(gray2, minValue, maxValue)
-    gray1 = cv2.bitwise_and(gray1, mask1)
-    gray2 = cv2.bitwise_and(gray2, mask2)
-    
-    #showImage(gray1)
-    
     kernel_size = (5,5)
     gray1 = cv2.GaussianBlur(gray1,kernel_size,0)
     gray2 = cv2.GaussianBlur(gray2,kernel_size,0)
-    showImage(gray1)
-    showImage(gray2)
+    #showImage(gray1)
+    #showImage(gray2,'2')
+    #cv2.waitKey(0)
+    #cv2.destroyAllWindows()
+    gray1_mean = np.mean(gray1.ravel())
+    gray1_max = np.max(gray1.ravel())
+    #gray1[gray1>150] = 0
     
-def showImage(file):
+    gray2_mean = np.mean(gray2.ravel())
+    gray2_max = np.max(gray2.ravel())
+    #gray2[gray2>150] = 0
+    
+    print(gray1.max())
+    
+    normalised1 = gray1/gray1_max
+    normalised2 = gray2/gray2_max
+    
+    plt.figure()
+    plt.imshow(normalised1)
+    plt.title('Year1')
+    plt.figure()
+    plt.imshow(normalised2)
+    plt.title('Year2')
+   
+    #plotSurface(normalised1)
+    #plotSurface(normalised2)
+    plt.show()
+    
+   
+    
+def plotSurface(data):
+    
+    height = data.shape[0]
+    width = data.shape[1]
+    
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    # Make data.
+    X = np.arange(width)
+    Y = np.arange(height)
+    
+    X, Y = np.meshgrid(X, Y)
+      
+    surf = ax.plot_surface(X, Y, data, cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False)
+    
+    
+    
+def showImage(file, figure_num="1"):
 
     if type(file)==str:
         img = cv2.imread(file,1)
@@ -40,6 +78,5 @@ def showImage(file):
     else:
         img = file
 
-    cv2.imshow('image', img)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.imshow(figure_num, img)
+    
