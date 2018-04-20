@@ -7,7 +7,9 @@ from imageProcessing import *
 import argparse
 from navFiles import *
 from makeGIF import createGIF
-
+from rootDir import rootDir, dataDir
+from plotting import *
+   
    
 def getNearestPhoto(photos, x_target, y_target):
 
@@ -28,7 +30,7 @@ def getPhotoFilesFromTarget(road, year, cameras, x_target, y_target, distance):
     # extracting PCDATE and PCTIME as this corresponds to the photo file name.
     # Files have format <camera_num>_<PCDATE>_<PCTIME>.jpg all cameras (1:4) are found.
     photo_files = []
-    file_dir = os.path.join(rootDir(), 'Data', road,year, 'Images')
+    file_dir = os.path.join(dataDir(), road, year, 'Images')
     for ind, row in nav_data_thresh.iterrows():
         for camera in cameras:
             file_name = '{}_{}_{}.jpg'.format(camera, str(row.PCDATE), str(row.PCTIME))
@@ -59,7 +61,7 @@ def getPhotoFilesFromFile(file, road, years, cameras, distance):
      
      
 def main(args):
-
+    
     photo_files = []
     #x_target, y_target = 472940.53000000000, 105979.69000000000 
     if len(args.target) > 0:
@@ -71,35 +73,41 @@ def main(args):
     elif len(args.file) > 0:  
             [photos, x_target, y_target] = getPhotoFilesFromFile(args.file, args.road, args.years, args.cameras, args.distance)
             photo_files.extend(photos)
+    
     else:
         print('No target or file specified')
         sys.exit()
     
     photo_df = pd.DataFrame(photo_files)
     photo_df.columns = ['file', 'road', 'year', 'camera', 'XCOORD', 'YCOORD']
-    
+    #print(photo_df)
     year1_photos = photo_df[photo_df['year']=='Year1']
     year1_photos = year1_photos.reset_index()
-    year2_photos = photo_df[photo_df['year']=='Year2']
-    year2_photos = year2_photos.reset_index()
+        
+    for year in args.years:
+        print('There are {:d} photos in {}'.format(len(photo_df[photo_df['year']==year]), year)) 
     
-    print('There are {:d} photos in Year {}'.format(len(year1_photos), '1'))
-    print('There are {:d} photos in Year {}'.format(len(year2_photos), '2'))  
-    
-    for ind, photo in year1_photos.iterrows():
-        nearest_photo = getNearestPhoto(year2_photos, photo.XCOORD, photo.YCOORD)
+    for ind, photo in year1_photos.iterrows():    
+        nearest_photos = {'Year1':photo}
+        
+        for year in args.years:
+            if year != 'Year1':
+                year_photos = photo_df[photo_df['year']==year]
+                year_photos = year_photos.reset_index()
+                nearest_photo = getNearestPhoto(year_photos, photo.XCOORD, photo.YCOORD)
+                nearest_photos[year] = nearest_photo    
+
         for camera in args.cameras:
             if int(photo.camera) in [2,4]:
-                top_down, road_img = topDownView(photo['file'])
-                top_down_neareast, road_img_nearest = topDownView(nearest_photo['file'])
                 if args.surface:
-                    showMultiWindow4(road_img, road_img_nearest, top_down, top_down_neareast, args.road, photo['file'].split('\\')[-1], args.gif)
+                    showMultiWindow(nearest_photos, args.road, args.gif)
                 else:
-                    showMultiWindow2(road_img, road_img_nearest)
+                    showMultiWindow2(nearest_photos)
     
     if args.gif:
         createGIF(args.road, str(x_target), str(y_target))
 
+    
     
 if __name__ == '__main__':
 
@@ -112,7 +120,12 @@ if __name__ == '__main__':
     parser.add_argument('--distance', '-d', type=int, nargs=1, default=1)
     parser.add_argument('--surface',  type=str, const=True, nargs='?', help="show image of road surface.")
     parser.add_argument('--gif',  type=str, const=True, nargs='?', help="create gif")
+    parser.add_argument('--road_detection',  type=str, const=False, nargs='?', help="create gif")
     
     args = parser.parse_args()
     
+    if len(args.target) > 0 and len(args.file) > 0:
+        print('Error, please use only the --file or --target argument, not both!')
+        sys.exit(0)
+        
     main(args)

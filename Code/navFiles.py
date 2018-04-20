@@ -1,5 +1,5 @@
 import os
-from rootDir import rootDir
+from rootDir import rootDir, dataDir
 from dbfread import DBF
 import pandas as pd
 import numpy as np
@@ -23,7 +23,7 @@ def getFileTarget(file, road, year):
    
 def getNavData(road, year):
     
-    nav_file = os.path.join(rootDir(),'Data',road,year,'Nav','{}.dbf'.format(road))
+    nav_file = os.path.join(dataDir(),road,year,'Nav','{}.dbf'.format(road))
     nav_data = DBF(nav_file)
     nav_data = pd.DataFrame(iter(nav_data))
     print(nav_data.columns)
