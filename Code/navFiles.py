@@ -26,8 +26,10 @@ def getNavData(road, year):
     nav_file = os.path.join(dataDir(),road,year,'Nav','{}.dbf'.format(road))
     nav_data = DBF(nav_file)
     nav_data = pd.DataFrame(iter(nav_data))
+    print(year)
     print(nav_data.columns)
     print(nav_data[['PITCH','YAW','HEADING','ROLL','HROC','VROC','ALT']].head(10))
+    print('\n')
     #print(nav_data[['CAM1_LVRX', 'CAM1_LVRY', 'CAM1_LVRZ']].head(10))
     nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
     return nav_data
