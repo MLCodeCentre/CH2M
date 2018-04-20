@@ -18,34 +18,42 @@ def findDifference(surface1, surface2):
     height = gray1.shape[0]
     width = gray1.shape[1]
     
-    kernel_size = (5,5)
-    gray1 = cv2.GaussianBlur(gray1,kernel_size,0)
-    gray2 = cv2.GaussianBlur(gray2,kernel_size,0)
+    kernel_size = (3,3)
+    #gray1 = cv2.GaussianBlur(gray1,kernel_size,0)
+    #gray2 = cv2.GaussianBlur(gray2,kernel_size,0)
+    
     #showImage(gray1)
     #showImage(gray2,'2')
     #cv2.waitKey(0)
     #cv2.destroyAllWindows()
     gray1_mean = np.mean(gray1.ravel())
     gray1_max = np.max(gray1.ravel())
-    #gray1[gray1>150] = 0
+    gray1[gray1>200] = gray1_mean
     
     gray2_mean = np.mean(gray2.ravel())
     gray2_max = np.max(gray2.ravel())
-    #gray2[gray2>150] = 0
+    gray2[gray2>200] = 0
     
     print(gray1.max())
     
     normalised1 = gray1/gray1_max
     normalised2 = gray2/gray2_max
     
+    InvNormalised1 = 1 / (normalised1)
+    InvNormalised2 = 1 / (normalised2)
+    
+    print(InvNormalised1.max())
+      
     plt.figure()
-    plt.imshow(normalised1)
+    plt.imshow(InvNormalised1, vmin=0, vmax=3)
     plt.title('Year1')
     plt.figure()
-    plt.imshow(normalised2)
+    plt.imshow(InvNormalised2, vmin=0, vmax=3)
     plt.title('Year2')
-   
-    #plotSurface(normalised1)
+    plt.figure()
+    difference = normalised1-normalised2
+    plt.imshow(difference, vmin=-3, vmax=3)
+    #plotSurface(difference)
     #plotSurface(normalised2)
     plt.show()
     
@@ -66,7 +74,7 @@ def plotSurface(data):
     X, Y = np.meshgrid(X, Y)
       
     surf = ax.plot_surface(X, Y, data, cmap=cm.coolwarm,
-                       linewidth=0, antialiased=False)
+                           linewidth=0, antialiased=False)
     
     
     
