@@ -3,7 +3,10 @@ from rootDir import rootDir, dataDir
 from dbfread import DBF
 import pandas as pd
 import numpy as np
-from matplotlib import pyplot as plt
+import argparse
+import seaborn as sns; sns.set(style="ticks", color_codes=True)
+import matplotlib.pyplot as plt
+
 
 def getFileTarget(file, road, year):
 
@@ -27,19 +30,15 @@ def getNavData(road, year):
     nav_file = os.path.join(dataDir(),road,year,'Nav','{}.dbf'.format(road))
     nav_data = DBF(nav_file)
     nav_data = pd.DataFrame(iter(nav_data))
-    print(year)
-    print(nav_data.columns)
-    print(nav_data[['PITCH','YAW','HEADING','ROLL','HROC','VROC','ALT']].head(10))
 
-    HROCS = nav_data['HROC'].tolist()
-    VROCS = nav_data['VROC'].tolist()
-    plt.plot(HROCS)
-    plt.figure()
-    plt.plot(VROCS)
-    plt.show()
-    print('\n')
-    #print(nav_data[['CAM1_LVRX', 'CAM1_LVRY', 'CAM1_LVRZ']].head(10))
-    nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
+    print(nav_data.head(10))
+    print(nav_data.columns)
+    
+    if year == 'Year2':    
+        nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME','TYPE']]
+    else:
+        nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
+        
     return nav_data
     
 
@@ -49,4 +48,28 @@ def getNavDataInThresh(nav_data, x_target, y_target, distance):
     y_dist = (nav_data['YCOORD'] - y_target)*(nav_data['YCOORD'] - y_target)
     norm = np.sqrt(x_dist + y_dist)
     nav_data_thresh = nav_data[norm < distance]
+    
     return nav_data_thresh
+    
+
+def getNavDataFromFile(year, road, file):
+    
+    YearNavFile = getNavData(road,year)
+    
+    if len(file) > 0:
+        file_name = file.replace('.jpg','')
+        [camera, PCDATE, PCTIME] = file_name.split('_')[0:3]
+        YearNavFile = YearNavFile[(YearNavFile['PCDATE'] == PCDATE) & (YearNavFile['PCTIME'] == PCTIME)]
+    #print(YearNavFile.head(10))
+    
+   
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='Get nav information about a specific file')
+    parser.add_argument('year', type=str, help='the year')
+    parser.add_argument('--file', type=str, help='the file in the year', default='')
+    parser.add_argument('--road', '-r', type=str, help='the road', default='A27')
+    
+    args = parser.parse_args()
+    
+    getNavDataFromFile(args.year, args.road, args.file)

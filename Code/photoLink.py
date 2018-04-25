@@ -95,6 +95,7 @@ def main(args):
                 year_photos = photo_df[photo_df['year']==year]
                 year_photos = year_photos.reset_index()
                 nearest_photo = getNearestPhoto(year_photos, photo.XCOORD, photo.YCOORD)
+                print('{} photo: {}'.format(year, nearest_photo['file']))
                 nearest_photos[year] = nearest_photo    
 
         for camera in args.cameras:
