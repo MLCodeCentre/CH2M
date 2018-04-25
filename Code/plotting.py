@@ -5,6 +5,7 @@ from imageProcessing import topDownView
 from rootDir import rootDir
 from findDamages import findDifference
 
+
 def showImage(file):
 
     if type(file)==str:
@@ -30,7 +31,9 @@ def showMultiWindow(nearest_photos, road, gif):
     surfaces = {}
     
     for year, photo in nearest_photos.items():
-        
+
+        print(year, photo['XCOORD'], photo['YCOORD'])
+
         top_down, road_img = topDownView(photo['file'], auto_detection=False)
         surfaces[year] = top_down
         try:

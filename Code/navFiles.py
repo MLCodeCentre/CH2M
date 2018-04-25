@@ -3,6 +3,7 @@ from rootDir import rootDir, dataDir
 from dbfread import DBF
 import pandas as pd
 import numpy as np
+from matplotlib import pyplot as plt
 
 def getFileTarget(file, road, year):
 
@@ -29,6 +30,13 @@ def getNavData(road, year):
     print(year)
     print(nav_data.columns)
     print(nav_data[['PITCH','YAW','HEADING','ROLL','HROC','VROC','ALT']].head(10))
+
+    HROCS = nav_data['HROC'].tolist()
+    VROCS = nav_data['VROC'].tolist()
+    plt.plot(HROCS)
+    plt.figure()
+    plt.plot(VROCS)
+    plt.show()
     print('\n')
     #print(nav_data[['CAM1_LVRX', 'CAM1_LVRY', 'CAM1_LVRZ']].head(10))
     nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
