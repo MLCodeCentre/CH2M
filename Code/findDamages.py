@@ -57,7 +57,6 @@ def findDifference(surface1, surface2):
     #plotSurface(normalised2)
     plt.show()
     
-   
     
 def plotSurface(data):
     

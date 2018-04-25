@@ -4,6 +4,18 @@ from roadUtils import *
 import os
 from rootDir import rootDir, dataDir
    
+
+def showImage(file):
+
+    if type(file)==str:
+        img = cv2.imread(file,1)
+        img = cv2.resize(img, (0,0), fx=0.25, fy=0.25)
+    else:
+        img = file
+
+    cv2.imshow('image', img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
    
 def topDownView(file, auto_detection):
     
@@ -47,8 +59,10 @@ def manualRoadPoints(img):
     (x3, y2) = (int(x1+x_diff), y1-top)
     (x4, y2) = (int(x2-x_diff), y1-top)
     
-    #cv2.line(img, (x1,y1), (x3,y2), (0, 255, 0), 2)
-    #cv2.line(img, (x2,y1), (x4,y2), (0, 255, 0), 2)
+    cv2.line(img, (x1,y1), (x3,y2), (0, 255, 0), 2)
+    cv2.line(img, (x2,y1), (x4,y2), (0, 255, 0), 2)
+    
+    showImage(img)
     
     tl = (x3, y2)
     tr = (x4, y2)
@@ -141,17 +155,17 @@ def autoRoadPoints(img):
         cv2.line(img, (rx2, ry2), (rx2_ext, ry2_ext), (0, 255, 0), 2)   
     
         # drawing line
-        # showImage(img)
+        showImage(img)
         
         bl = (lx1_ext, ly1_ext) 
         tl = (lx2_ext, ly2_ext)
         br = (rx1_ext, ry1_ext)
         tr = (rx2_ext, ry2_ext)
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(img,'TL',tl,font,1,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(img,'TR',tr,font,1,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(img,'BL',bl,font,1,(255,255,255),2,cv2.LINE_AA)
-        cv2.putText(img,'BR',br,font,1,(255,255,255),2,cv2.LINE_AA)
+        #cv2.putText(img,'TL',tl,font,1,(255,255,255),2,cv2.LINE_AA)
+        #cv2.putText(img,'TR',tr,font,1,(255,255,255),2,cv2.LINE_AA)
+        #cv2.putText(img,'BL',bl,font,1,(255,255,255),2,cv2.LINE_AA)
+        #cv2.putText(img,'BR',br,font,1,(255,255,255),2,cv2.LINE_AA)
        
     points = np.array([tl, tr, bl, br], dtype=np.float32)
     reference_points = np.array([[0,0], [width,0], [0,height], [width,height]], dtype=np.float32)

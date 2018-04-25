@@ -42,7 +42,7 @@ def showMultiWindow(nearest_photos, road, gif):
         plt.subplot(2,number_years,photo_position+number_years), plt.imshow(top_down), plt.axis('off')
         photo_position = photo_position + 1
             
-    findDifference(surfaces['Year1'], surfaces['Year2'])
+    #findDifference(surfaces['Year1'], surfaces['Year2'])
  
     if gif:
         file_name = nearest_photos['Year1']['file'].split('\\')[-1]
