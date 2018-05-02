@@ -30,11 +30,11 @@ def getNavData(road, year):
     nav_file = os.path.join(dataDir(),road,year,'Nav','{}.dbf'.format(road))
     nav_data = DBF(nav_file)
     nav_data = pd.DataFrame(iter(nav_data))
-    print(nav_data.head(10))
+    #print(nav_data.head(10))
     print(nav_data.columns)
     
-    if year == 'Year2':    
-        nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME','TYPE']]
+    if year == 'Year2':
+        nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME','TYPE','YAW']]
     else:
         nav_data = nav_data[['ID','XCOORD','YCOORD','LAT','LON','PCDATE','PCTIME']]
         
@@ -59,14 +59,14 @@ def getNavDataFromFile(year, road, file):
         file_name = file.replace('.jpg','')
         [camera, PCDATE, PCTIME] = file_name.split('_')[0:3]
         YearNavFile = YearNavFile[(YearNavFile['PCDATE'] == PCDATE) & (YearNavFile['PCTIME'] == PCTIME)]
-    #print(YearNavFile.head(10))
+    print(YearNavFile.head(10))
     
    
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Get nav information about a specific file')
     parser.add_argument('year', type=str, help='the year')
-    parser.add_argument('--file', type=str, help='the file in the year', default='')
+    parser.add_argument('file', type=str, help='the file in the year')
     parser.add_argument('--road', '-r', type=str, help='the road', default='A27')
     
     args = parser.parse_args()

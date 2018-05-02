@@ -58,7 +58,7 @@ def showMultiWindow2(nearest_photos):
     number_years = len(nearest_photos.keys())
     photo_position = 1
     for year, photo in nearest_photos.items():
-
+        print(photo['file'])
         road_img = cv2.imread(photo['file'],1)
         road_img = cv2.resize(road_img, (0,0), fx=0.25, fy=0.25)
         
