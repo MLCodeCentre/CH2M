@@ -47,7 +47,7 @@ function error = cameraDisplacements()
         if plot
             plotPixels(U,UT);
         end
-        
+        disp({'Pixels: ', U(1), U(2)})
         error = norm(U-UT);
        
     end
