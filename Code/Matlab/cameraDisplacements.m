@@ -1,31 +1,43 @@
-function error = cameraDisplacements()
+function error = cameraDisplacements(plot)
+    
+    % sort of variable inputs
+    if ~exist('plot','var') || isempty(plot)
+        plot = true;
+    end
+
     close all;
     
     params = config();
-    plot = true;
     
     file = fullfile(dataDir(),'A27','object_positions.csv');
     data = readtable(file);
 
     num_rows = size(data,1);
     for row_index = 2:2
-        
+       
         row = data(row_index, :);
-        img_file = fullfile('C:','CH2MData','A27','Year2','Images',row.Photo{1});
+        img_file = fullfile(dataDir(),'A27','Year2','Images',row.Photo{1});
         % getting displacement vector W, with origin of car in world 
         % [Easting, Northing, Height]
+        
         W = [row.ArcGis_XCOORD - row.Photo_XCOORD
              row.ArcGis_YCOORD - row.Photo_YCOORD
-             row.Height];
+             row.Height - params.Z0];
         % true pixel values
         UT = [row.Pixel_Width, row.Pixel_Height];
         % theta taken from YAW of car
         theta = row.YAW;
         
+        C = [row.Photo_XCOORD, row.Photo_YCOORD, params.Z0];
+        P = [row.ArcGis_XCOORD, row.ArcGis_YCOORD, row.Height];
+        plotWorldScene(C,P,theta,params.alpha)
+        
         % plotting change of co-ordinate system from World to Camera
-        % plotScene(W,params.Z0,theta,params.alpha);
+        if plot
+            plotScene(W,params.Z0,theta,params.alpha);
+        end
         % R is displacement vector from camera to object in new view
-        R = toCameraCoords(W,theta); 
+        R = toCameraCoords(W,theta);
         if plot
             plotDownTheRoad(R,params.Z0,params.alpha);
         end
@@ -53,7 +65,9 @@ function error = cameraDisplacements()
     end
 end % cameraDisplacements.m
 
-function plotPixels(U,UT) 
+function plotPixels(U,UT)
+    % plotting ground truth pixel and found via equations
+    figure();
     plot(U(1),U(2),'bo')
     xlabel('u')
     ylabel('v')
@@ -62,35 +76,49 @@ function plotPixels(U,UT)
     legend('Calculated','Ground Truth')
 end
 
-function plotScene(W,Z0,theta,alpha)    
-    figure();
+function plotWorldScene(C,P,theta,alpha)
+    figure()
+    Rot = rotx(alpha)*rotz(theta);
+    plotCamera('Location',[C(1), C(2), C(3)],'Orientation',Rot,'Opacity',0,'size',0.3);
+    hold on
+    Easting = P(1);
+    Northing = P(2);
+    Z = P(3);
+    scatter3(Easting,Northing,Z,'.')
+    text(Easting,Northing,Z,'P','FontWeight','bold','FontSize',14)
+    xlabel('Easting [m]');ylabel('Northing [m]');zlabel('Z [m]');title('World View')
+    grid on
+    axis equal  
+end
+
+function plotScene(W,Z0,theta,alpha)
     % plotting camera and object in original world co-ordinates
+    figure();
     Easting = W(1);
     Northing = W(2);
     Z = W(3);
     Rot = rotx(alpha)*rotz(theta);
-    plotCamera('Location',[0, 0, Z0],'Orientation',Rot,'Opacity',0,'size',0.2);
+    plotCamera('Location',[0, 0, Z0],'Orientation',Rot,'Opacity',0,'size',0.3);
     hold on
-    scatter3(Easting,Northing,Z)
-    xlabel('Easting')
-    ylabel('Northing')
-    zlabel('Z')
+    scatter3(Easting,Northing,Z,'.')
+    text(Easting,Northing,Z,'P','FontWeight','bold','FontSize',14)
+    xlabel('Easting [m]');ylabel('Northing [m]');zlabel('Z [m]');title('World View')
     grid on
     axis equal  
 end
 
 function plotDownTheRoad(R,Z0,alpha)
+    % plotting camera and point in down the road view.
     figure();
     X = R(1);
     Y = R(2);
     Z = R(3);
     RotCamera = rotx(alpha);   
-    plotCamera('Location',[0, 0, Z0],'Orientation',RotCamera,'Opacity',0,'size',0.2);
+    plotCamera('Location',[0, 0, Z0],'Orientation',RotCamera,'Opacity',0,'size',0.3);
     hold on
-    scatter3(X,Y,Z)
-    xlabel('X')
-    ylabel('Y')
-    zlabel('Z')
+    scatter3(X,Y,Z,'.')
+    text(X,Y,Z,'P','FontWeight','bold','FontSize',14)
+    xlabel('X [m]');ylabel('Y [m]');zlabel('Z [m]');title('Down The Road View')
     grid on
     axis equal  
 end
