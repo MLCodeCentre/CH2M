@@ -1,11 +1,12 @@
 function imagePlaneFun
+
 close all
 params = config();
 % defining road coordinates a meter either side of camera and 20 metres
 % long
-x = -1:0.5:1;
+x = -1:0.2:0.8;
 
-y = 1:0.2:10;
+y = 0:1:70;
 
 % plotting the road
 [XX,YY] = meshgrid(x,y);
@@ -19,6 +20,12 @@ Z = zeros(size(XX(:),1),1);
 % axis equal; grid on
 
 % get corresponding points in the image plane
+vanish_point = -(params.lambda/(tan(deg2rad(params.alpha))))*(1/params.sy)...
+                 + params.cy
+zero_point = (params.lambda*((params.Z0*sin(deg2rad(params.alpha))))/...
+                           (params.Z0*cos(deg2rad(params.alpha)) + params.lambda))...
+              *(1/params.sy)             
+
 figure();
 Z = 0;
 [x_img,y_img] = getImagePlaneCoords(XX,YY,Z,...
@@ -30,7 +37,13 @@ Z = 0;
 planeCoords = [x_img(:), y_img(:)];
 plot(planeCoords(:,1),planeCoords(:,2),'bo')
 xlabel('x [m]'); ylabel('y [m]'); title('Image Plane')
-axis equal; grid on
+
+X_min = (0 - params.cx)*params.sx;
+X_max = (params.m - params.cx)*params.sx;
+Y_min = -(0 - params.cy)*params.sy;
+Y_max = -(params.n - params.cy)*params.sy;
+
+axis([-abs(X_min), abs(X_max), -abs(Y_min), abs(Y_max)])
 
 % getting the corresponding pixels
 [u,v] = getPixels(x_img,y_img,...
@@ -48,6 +61,16 @@ xlabel('u'); ylabel('v'); title('Pixel Plane')
 axis([0,params.m,0,params.n])
 set(gca,'Ydir','reverse') % this is to reflect the y axis being reversed in images
 axis equal; grid on
+
+% figure()
+% plot(y_img)
+% xlabel('Y[m]'); ylabel('y_{img}');
+% hold on     
+% 
+% figure()
+% plot(v)
+% xlabel('Y[m]'); ylabel('v');
+% set(gca,'Ydir','reverse') % this is to reflect the y axis being reversed in images
 end %imagePlaneFun
 
 
