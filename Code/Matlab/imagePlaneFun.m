@@ -4,8 +4,8 @@ close all
 params = config();
 % defining road coordinates a meter either side of camera and 20 metres
 % long
-x = -2.4:0.2:2;
-y = 16:1:55;
+x = -2.3:0.5:1.45;
+y = 16:0.5:55;
 
 % defining meshgrid across the road
 [XX,YY] = meshgrid(x,y);
@@ -13,9 +13,8 @@ Z = 0;
 
 % get corresponding points in the image plane
 vanish_point = -(params.lambda/(tan(deg2rad(params.alpha))))*(1/params.sy)...
-                 + params.cy
-
-Z = 0;
+                 + params.cy;
+             
 [x_img,y_img] = getImagePlaneCoords(XX,YY,Z,...
                                     params.Z0,params.r1,params.r2,params.r3,...
                                     params.lambda,...
@@ -33,11 +32,13 @@ X_max = (params.m - params.cx)*params.sx;
 Y_min = -(0 - params.cy)*params.sy;
 Y_max = -(params.n - params.cy)*params.sy;
 
-axis([-abs(X_min), abs(X_max), -abs(Y_min), abs(Y_max)])
+% axis([-abs(X_min), abs(X_max), -abs(Y_min), abs(Y_max)])
 
 % getting the corresponding pixels
 [u,v] = getPixels(x_img,y_img,...
-                  params.cx,params.cy,params.sx,params.sy);
+                   params.cx,params.cy,params.sx,params.sy);
+
+% [u,v] = coords2Pixels(XX,YY,Z);
 
 figure();
 % overlaying them on an image

@@ -1,7 +1,7 @@
 function params = config()
     % define parameters
-    params.Z0 = 1; % height of camera
-    params.alpha = 83.837; % angle rotated around X axis in degrees
+    params.Z0 = 2.5; % height of camera
+    params.alpha = 86; % angle rotated around X axis in degrees
     params.lambda = 0.05; % camera focal length
     
     params.cy = 1024; params.cx = 1280; % focal centre of camera
@@ -19,6 +19,10 @@ function params = config()
     %% try constraining sy and lambda by the vanishing point
     %params.sy = 2.2e-05;
     params.sy = -(params.lambda/tan(deg2rad(params.alpha))) * (1/(780-params.cy));
-    params.sx = params.sy/0.8;% effective pixel size of X,Y
-    params
+    params.sx = params.sy/0.8;% effective pixel size of X,Y;
+
+    % intrinsic parameters
+    params.alpha_x = 1040;
+    params.alpha_y = 1040;
+    params.gamma = 0;
 end 

@@ -4,5 +4,5 @@ function R = toCameraCoords(W,theta)
     RotRoad = rotz(theta);
     % getting displacement vector in that new co-ordinate system
     R = RotRoad*W;
-    % Rotating the Camera againe
+    % Rotating the Camera again
 end
