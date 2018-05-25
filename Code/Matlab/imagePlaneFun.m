@@ -4,14 +4,13 @@ params = config();
 % defining road coordinates a meter either side of camera and 20 metres
 % long
 x = -1:0.5:1;
-
-y = 1:0.2:10;
+y = 1:0.2:40;
 
 % plotting the road
 [XX,YY] = meshgrid(x,y);
 Z = zeros(size(XX(:),1),1);
-% plot(XX(:),YY(:),'ko');
-% scatter3(XX(:), YY(:), Z);
+plot(XX(:),YY(:),'ko');
+%scatter3(XX(:), YY(:), Z);
 % hold on
 % Rot = rotx(params.alpha);
 % plotCamera('Location',[0, 0, params.Z0],'Orientation',Rot,'Opacity',0,'size',0.3);
