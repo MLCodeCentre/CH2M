@@ -100,6 +100,7 @@ def main(args):
 
         for camera in args.cameras:
             if int(photo.camera) in [2,4]:
+                print(nearest_photos)
                 if args.surface:
                     showMultiWindow(nearest_photos, args.road, args.gif)
                 else:
