@@ -33,8 +33,8 @@ def plotSurveys(years, road):
     for year in years:
         print(road, year)
         nav_data = getNavData(road, year)
-        if year == 'Year2':
-            nav_data = nav_data[nav_data['TYPE']=='main']
+        # if year == 'Year2':
+        #     nav_data = nav_data[nav_data['TYPE']=='main']
             
         print(len(nav_data))
         #nav_data = nav_data[0:5000]
