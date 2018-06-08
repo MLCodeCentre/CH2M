@@ -6,7 +6,7 @@ cam_height = 0.21;
 camera_pos = [0,0,cam_height];
 
 %% plotting experiment
-stickyNotesData = readtable(fullfile(dataDir(),'Experiment','StickyNotes.csv'));
+stickyNotesData = readtable(fullfile(dataDir(),'Experiment','StickyNotes.csv'))
 
 
 plotCamera('Location',camera_pos,'Orientation',rotx(90),'Size',0.05)
@@ -35,8 +35,8 @@ imshow(I);
 hold on
 
 %% calculating angles
-n = 4032; cx = 2016; % >
-m = 3024; cy = 1512; % ^
+m = 4032; cx = 2016; % >
+n = 3024; cy = 1512; % ^
 
 rat1s = [];
 rat2s = []; 
@@ -58,8 +58,8 @@ for row_ind = 1:num_stickyNotes
    
    [phi,psi] = collapseOntoPlane(y,z,x);
    
-   rat1s = [rat1s, u/(2*n*tan(phi))];
-   rat2s = [rat2s, v/(2*m*tan(psi))];
+   rat1s = [rat1s, u/(2*m*tan(phi))];
+   rat2s = [rat2s, v/(2*n*tan(psi))];
 
 end
 
