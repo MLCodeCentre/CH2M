@@ -6,7 +6,7 @@ params = config();
 % long
 
 x = -2.3:0.5:1.45;
-y = 16:0.5:55;
+y = 16:1:55;
 
 % defining meshgrid across the road
 [XX,YY] = meshgrid(x,y);
