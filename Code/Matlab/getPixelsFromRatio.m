@@ -7,6 +7,6 @@ function [u,v] = getPixelsFromRatio(x,y,z,beta,m,n,cx,cy)
 % co-ordinate planes:
 [phi,psi] = collapseOntoPlane(y,z,x);
 % transform using trig
-u = beta*2*m*tan(phi) + cx;
-v = -beta*2*n*tan(psi)+ cy;
+u = beta*m*tan(phi) + cx;
+v = -beta*n*tan(psi)+ cy;
 
