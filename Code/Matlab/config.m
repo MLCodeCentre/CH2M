@@ -1,7 +1,9 @@
 function params = config()
     % define parameters
     params.Z0 = 2.5; % height of camera
+
     params.alpha = 82; % angle rotated around X axis in degrees
+
     params.lambda = 0.05; % camera focal length
     
     params.cy = 1024; params.cx = 1280; % focal centre of camera
