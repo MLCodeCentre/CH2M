@@ -49,10 +49,10 @@ Y = [2113, 1984;
      973,  1129];
 
 
-n = 1000; %samples per parameter
+n = 100; %samples per parameter
 alpha = linspace(0.1,90,n); %alpha range and corresponding sy
 lambda = linspace(0,0.8,n);
-lambda = 0.072;
+%lambda = 0.072;
 
 [A,L] = meshgrid(alpha, lambda);
 sy = -(L./tan(deg2rad(A))) .* (1/(780-params.cy));
@@ -77,11 +77,11 @@ errors = mean(errors,3);
 Uerrors = mean(Uerrors,3);
 Verrors = mean(Verrors,3);
 
-% surf(A,L,errors);
-% xlabel('\alpha [deg]');ylabel('\lambda [m]');zlabel('E(\alpha, \lambda)');
-% colorbar
-% zlim([0,1000])
-% caxis([0,1000])
+surf(A,L,errors);
+xlabel('\alpha [deg]');ylabel('\lambda [m]');zlabel('E(\alpha, \lambda)');
+colorbar
+zlim([0,1000])
+caxis([0,1000])
 
 [val,Idx] = min(errors(:))
 [Errors_minRow,Errors_minCol] = ind2sub(size(errors), Idx);

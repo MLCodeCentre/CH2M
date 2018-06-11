@@ -1,7 +1,9 @@
 function params = config()
     % define parameters
     params.Z0 = 2.5; % height of camera
-    params.alpha = 0; % angle rotated around X axis in degrees
+
+    params.alpha = 82; % angle rotated around X axis in degrees
+
     params.lambda = 0.05; % camera focal length
     
     params.cy = 1024; params.cx = 1280; % focal centre of camera
@@ -12,7 +14,8 @@ function params = config()
     cam_geo = readtable(fullfile(dataDir(),'A27','Year2','cam_geo.csv'));
     %params.theta = cam_geo.CAM2_THETA; % extra tilt
     params.theta = 0;
-    params.r1 = cam_geo.CAM2_LVRX/1000;
+
+    params.r1 = cam_geo.CAM2_LVRX/1000; 
     params.r2 = cam_geo.CAM2_LVRY/1000; 
     params.r3 = cam_geo.CAM2_LVRZ/1000; % position of camera on fixing
     

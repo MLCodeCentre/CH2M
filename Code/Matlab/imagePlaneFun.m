@@ -4,12 +4,22 @@ close all
 params = config();
 % defining road coordinates a meter either side of camera and 20 metres
 % long
+
 x = -2.3:0.5:1.45;
-y = 16:0.5:55;
+y = 16:1:55;
 
 % defining meshgrid across the road
 [XX,YY] = meshgrid(x,y);
+Z = zeros(size(XX(:),1),1);
+plot(XX(:),YY(:),'ko');
+%scatter3(XX(:), YY(:), Z);
+% hold on
+% Rot = rotx(params.alpha);
+% plotCamera('Location',[0, 0, params.Z0],'Orientation',Rot,'Opacity',0,'size',0.3);
+% xlabel('X [m]'); ylabel('Y [m]'); title('Road Points')
+% axis equal; grid on
 Z = 0;
+
 
 % get corresponding points in the image plane
 vanish_point = -(params.lambda/(tan(deg2rad(params.alpha))))*(1/params.sy)...
