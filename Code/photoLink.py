@@ -79,6 +79,7 @@ def main(args):
         sys.exit()
     
     photo_df = pd.DataFrame(photo_files)
+    
     photo_df.columns = ['file', 'road', 'year', 'camera', 'XCOORD', 'YCOORD']
     #print(photo_df)
     year1_photos = photo_df[photo_df['year']=='Year1']
