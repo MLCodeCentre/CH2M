@@ -15,7 +15,7 @@ photo2light1 = norm(photo-light1);
 photo2light2 = norm(photo-light2);
 light12light2 = norm(light1-light2);
 lane2shoulder = norm(lane_marker0-shoulder0);
-lane2photo = norm();
+lane2photo = norm(lane_marker0-photo);
 shoulder2photo = norm(shoulder0-photo);
 
 
