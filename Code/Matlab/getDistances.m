@@ -10,6 +10,8 @@ light2 = toCameraCoords([471268.121; 105939.688; 0],theta);
 photo = toCameraCoords([471321.89; 105924.91; 0],theta);
 shoulder0 = toCameraCoords([471313.404; 105923.927; 0],theta);
 lane_marker0 = toCameraCoords([471314.413; 105927.25; 0],theta);
+shoulder0-photo
+lane_marker0-photo
 % Euclidean Distances
 photo2light1 = norm(photo-light1);
 photo2light2 = norm(photo-light2);

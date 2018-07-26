@@ -1,0 +1,236 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx,fullpage}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage[section]{placeins}
+
+
+\newcommand{\mtx}[1]{\ensuremath{\mathbf{#1}}}
+
+\title{From The World to Pixels on a Digital Image}
+\date{\today}
+\author{Tom Strain}
+
+\begin{document}
+\maketitle
+\section{Introduction}
+This report describes a novel method for transforming a coordinate in three-dimensional space $(x,y,z)$, into pixels $ (u,v)$ in a digital image taken by a camera. Equations that express the pixels in terms of the cameras intrinsic and extrensic parameters are derived from first principles, from these, the vanishing point special case is found. It is shown that the parameters can be solved with knowledge of 2 sets of coordinates and corresponding pixels, and the vanishing point. This methodology is validated via an experiment in which a photograph of a table is taken at a known position and the camera parameters are consequently solved, it is then shown that any section of the table can be found using the solved parameters. 
+
+\section{Method}
+\subsection{Coordinate Transformation} 
+Let us define the world as a cartesian coordinate system $(x,y,z)$ and the camera coordinate system $ (e_1,e_2,e_3)$. The camera is located at the coordinate vector  $\mtx{c} = [x_c,y_c,z_c]$ and is assumed to be known as shown in Figure \ref{fig:axis}. The coordinate vecotor $\mtx{p} = [x_p,y_p,z_p]$ is transformed into the camera coordinate system by translating such that $c$ is at the origin, and rotating through the pan $(\gamma)$, roll $(\beta)$, and tilt $(\alpha)$ angles of the camera; around the $z$,$y$ and $x$ axes respectively. The rotations are the SO(3) Rotation Group Matrices \cite{rotations}, therefore:
+
+\begin{align}
+\textbf{p}_c & = 
+\begin{bmatrix}
+    \cos\gamma & -\sin\gamma & 0 \\
+    \sin\gamma & \cos\gamma & 0 \\
+       0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    \cos\beta & 0 & \sin\beta \\
+    0 & 1 & 0 \\
+   -\sin\beta & 0 & \cos\beta
+\end{bmatrix}
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & \cos\alpha & -\sin\alpha \\
+    0 & \sin\alpha &  \cos\alpha
+\end{bmatrix}
+\textbf{p}-\textbf{c}
+\\ & =
+\mtx{R} \mtx{t}
+\end{align}
+where
+\begin{equation}
+\mtx{R} =
+\begin{bmatrix}
+\cos\gamma\cos\beta & -\sin\gamma\cos\alpha + \cos\gamma\sin\beta\sin\alpha & \sin\gamma\sin\alpha + \cos\gamma\sin\beta\cos\alpha \\
+\sin\gamma\cos\beta & \cos\gamma\cos\alpha + \sin\gamma\sin\beta\sin\alpha & -\cos\gamma\sin\alpha + \sin\gamma\sin\beta\cos\alpha \\
+-\sin\beta & \cos\beta\sin\alpha & \cos\beta\cos\alpha
+\end{bmatrix}
+\end{equation}
+and
+\begin{equation}
+\mtx{t} = \textbf{p}-\textbf{c}.
+\end{equation}
+
+\begin{figure}
+\centering
+\includegraphics[width=6cm]{images/axis.png}
+\caption{World and Camera Coordinate Systems.}\label{fig:axis}
+\end{figure}
+
+In the case where $\textbf{c} = (0,0,0)$ and $\gamma = \beta = \alpha = 0$, then  $(x,y,z) = (e_1,e_2,e_3)$  and  $\textbf{p} =\textbf{p}_c$. The rest of the report considers transforming $\textbf{p}_c$ into pixels $(u,v)$ on a digital image taken by the camera.
+
+\subsection{Collapsing onto Planes}
+
+ The Image taken by the Camera is orthogonal to \textbf{e\textsubscript{2}}, also known as the Optical Axis. The position of \textbf{p\textsubscript{c}} in the (\textbf{e\textsubscript{1}},\textbf{e\textsubscript{3}}) plane are the components of \textbf{p\textsubscript{c}} in the (\textbf{e\textsubscript{3}},\textbf{e\textsubscript{2}}) plane \textbf{p\textsubscript{32}}, and  in the  (\textbf{e\textsubscript{1}},\textbf{e\textsubscript{2}}) plane \textbf{p\textsubscript{12}} where,
+
+$$ \textbf{p\textsubscript{32}} =  \textbf{p\textsubscript{c}} - ( \textbf{p\textsubscript{c}}\cdot\textbf{e\textsubscript{1}})\textbf{e\textsubscript{1}} $$ 
+and
+$$ \textbf{p\textsubscript{12}} =  \textbf{p\textsubscript{c}} - ( \textbf{p\textsubscript{c}}\cdot\textbf{e\textsubscript{3}})\textbf{e\textsubscript{3}} $$
+
+\textbf{p\textsubscript{32}} and \textbf{p\textsubscript{12}} make the angles $\psi$ and $\phi$ with \textbf{e\textsubscript{2}} respectively.
+
+
+\begin{figure}[h]
+    \centering
+    \subfloat[]{{\includegraphics[width=5cm]{images/planes.png} }}%
+    \qquad
+    \subfloat[]{{\includegraphics[width=4cm]{images/image_plane.png} }}%
+    \caption{a) \textbf{p\textsubscript{c}} in the Camera coordinate system and it's components in the (\textbf{e\textsubscript{2}},\textbf{e\textsubscript{3}}) and (\textbf{e\textsubscript{2}},\textbf{e\textsubscript{1}}) planes. b) \textbf{p\textsubscript{c}} in the (\textbf{e\textsubscript{1}},\textbf{e\textsubscript{3}}) plane.} %
+    \label{fig:example}%
+\end{figure}
+
+\subsection{Onto the Image Plane}\label{ontotheplane}
+
+The camera is assumed to be a pinhole camera \cite{pinholeModel}, the origin of the camera coordinate system is at the lens. $\textbf{p}_c$ is projected through the lens onto the image plane inside the camera, the focal length $\lambda$ is the distance from the lens to the image plane which has size $L_1 \times L_2$. Consider the camera in the $(e_2,e_3)$ plane shown below in Figure \ref{fig:pinhole}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=9.5cm]{images/pinhole.png}
+\caption{Projection of \textbf{P}\textsubscript{c} onto the Image Plane through a Pinhole Camera}\label{fig:pinhole}
+\end{figure}
+
+\textbf{p\textsubscript{c}} is projected to point h on the Image Plane, via trigonometry $h = \lambda\tan\psi$. Identically, the projection of \textbf{p\textsubscript{c}} onto the Image Plane in the (\textbf{e\textsubscript{2}},\textbf{e\textsubscript{1}}) plane is: $w = \lambda\tan\phi$.
+
+\subsection{From the Image Plane to Pixels}
+
+Assuming perfectly square identical Pixels throughout the Digital Image, we now describe the transformation from coordinate $(w,h)$ on the Image Plane to Pixel coordinate $(u,v)$ on a Digital Image of size $m\times n$ Pixels. 
+As there are $m$ Pixels equally spaced along length $L_1$ and $n$ Pixels along $L_2$ it follows that:
+
+\begin{equation}\label{u1}
+u = \frac{m}{L_1}w = m\frac{\lambda}{L_1}\tan\phi
+ = m\frac{\lambda}{L_1} 
+\frac{\textbf{p\textsubscript{32}}\cdot\textbf{e\textsubscript{2}}}
+{\textbf{p\textsubscript{32}}\cdot\textbf{e\textsubscript{3}}}
+\end{equation}
+and
+\begin{equation}\label{u2}
+v = \frac{n}{L_2}h=n\frac{\lambda}{L_2}{\tan\psi}
+ = n\frac{\lambda}{L_2}
+ \frac{\textbf{p\textsubscript{12}}\cdot\textbf{e\textsubscript{2}}}
+{\textbf{p\textsubscript{12}}\cdot\textbf{e\textsubscript{1}}}
+\end{equation}
+
+Expressing Equations \ref{u1} and \ref{u2} in terms of the pitch, pan and tilt angles in matrix $\mtx{R}$ yields the following:
+
+\begin{equation}\label{u}
+u = m\frac{\lambda}{L_1}
+\bigg[ \frac{\mtx{R}_{11}x+ \mtx{R}_{12}y + \mtx{R}_{13}z}
+{\mtx{R}_{21}x+ \mtx{R}_{22}y + \mtx{R}_{23}z} \bigg]
+\end{equation}
+
+\begin{equation}\label{v}
+v= n\frac{\lambda}{L_2}
+\bigg[ \frac{\mtx{R}_{31}x+ \mtx{R}_{32}y + \mtx{R}_{33}z}
+{\mtx{R}_{21}x+ \mtx{R}_{22}y + \mtx{R}_{23}z} \bigg]
+\end{equation}
+
+Equations \ref{u} and \ref{v} describe the Pixel coordinates as a function of a position in the world $(u(x,y,z),v(x,y,z))$ parameterised by the Intrinsic Camera parameters $\gamma, \beta$ and $\alpha$, and the Intrinsic Camera parameters $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+
+\subsubsection{Vanishing Points}
+
+The vanishing point in a Digital Image is the point at which all parallel lines orthogonal to the  $(\textbf{e\textsubscript{1}}.\textbf{e\textsubscript{3}})$ plane converge and can be found by inspection of the Digital Image. Let us denote this Pixel pair as $(u_p, v_p)$, it follows then that:
+
+\begin{equation}\label{up}
+u_p = \lim_{y\to\infty} u(x,y,z) = m\frac{\lambda}{L_1}
+\bigg[ \frac{-\sin\gamma\cos\alpha + \cos\gamma\sin\beta\sin\alpha}{\cos\beta\cos\alpha+\sin\gamma\sin\beta\sin\alpha} \bigg]
+\end{equation}
+
+\begin{equation}\label{vp}
+v_p = \lim_{y\to\infty} v(x,y,z) = n\frac{\lambda}{L_2}
+\bigg[ \frac{\cos\beta\sin\alpha}{\cos\beta\cos\alpha+\sin\gamma\sin\beta\sin\alpha} \bigg]
+\end{equation}
+
+Equations \ref{u},\ref{v},\ref{up} and \ref{vp} form a set of 4 Equations to be solved for 5 parameters, and therefore represent an under-determined system. Consequently 2 corresponding pairs of World and Pixel coordinates are required - forming the 5 Equations to find $\gamma$,$\beta$,$\alpha$,$\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+
+\section{Experiment}
+
+An experiment was undertaken in order to ascertain the effectiveness of the methods described in this report, an iPhone 6 Camera was placed in a stand at a height of 0.205m at the end of 2 joined tables each 50cm in width and 120cm in length.\\
+
+We can use the corners where the 2 Tables meet, and the corners at the end of the second table as reliable data points. The experiment set up and 4 data points are shown in Figure \ref{fig:experiment}. Taking the end where the Camera was placed, half way across the table, and the table height as the origin of the World coordinate origin, the positions in the World $(x,y,z)$ and Pixels $(u,v)$ of the near left corner each sticky note are shown in Table \ref{table:1}. By inspection, the Vanishing Point is found to be $(1992,1267)$. 
+\newline
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{images/table_data.png}
+\caption{Experiment setup}\label{fig:experiment}
+\end{figure}
+
+\begin{table}[!htb]
+\begin{center}
+\begin{tabular}{ |c|c|c|c|c|c| } 
+\hline
+Corner & $x$[m] & $y$[m] & $z$[m] &$u$ & $v$\\
+\hline
+1 & -0.25 & 1.20 &-0.205 & 1293 & 1852 \\
+2 & 0.25 & 1.20 & -0.205 & 2692 & 1866 \\
+3 & -0.25 & 2.40 & -0.205 & 1642 & 1563 \\
+4 & 0.25 & 2.40 & -0.205 & 2340 & 1573\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Sticky Note coordinates in the World and Pixels in the Digital Image}
+\label{table:1}
+\end{table}
+
+We now solve the 5 system parameters with 6 Equations: Equations \ref{u} and \ref{v} for the World and Pixel coordinates of the first and last corners and Equations \ref{up} and \ref{vp} for the Vanishing Point of the Digital Image. 
+ The \texttt{fsolve} numerical equation solver in Maple is used to solve the 5 Extrinsic and Instrinsic Camera parameters within the upper and lower bounds shown in Table \ref{table:bounds}. The upper and lower bounds do the following:
+
+\begin{itemize}
+
+\item  constrain the pan, roll and tilt angles between $-\pi$ and $\pi$, without this there are of course an infinite number of solutions due to the trigonemtric form of equations \ref{u}, \ref{v}, \ref{up} and \ref{vp}, 
+\item ensure  $\frac{\lambda}{L_1}$  and $\frac{\lambda}{L_2}$ are positive, since $\lambda$,$L_1$ and $L_2$ are all positive lengths.
+
+\end{itemize}
+
+\begin{table}[!htb]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Parameter & $\gamma$ & $\beta$ & $\alpha$ & $\frac{\lambda}{L_1}$ & $\frac{\lambda}{L_2}$\\
+\hline
+Lower Bound & $-\pi$ & $-\pi$ & $-\pi$ & 0 & 0 \\ 
+Upper Bound & $\pi$ & $\pi$ & $\pi$ & $\infty$ & $\infty$ \\
+Value & 0.007 & 0.005 & 0.071 & 0.835 & 1.146 \\
+\hline
+\end{tabular}
+\caption{Parameter value and upper and lower bounds used by the solver}
+\label{table:bounds}
+\end{table}
+
+\subsection{Validation}
+An interesting task then is to see where the corresponding Pixels for a set points of which the World coordinates are known are found to be in the Digital Image. Consider the Table that the Camera is fixed to. The Table in the World is a set of coordinates $(x,y,z)$ where $x \in \left[ -0.25,0.25\right]$,  $y \in \left[0,2.4\right]$, and $z=-0.21$.  The corresponding set of Pixels for the Table coordinates are then found using Equations \ref{u} and \ref{v} with the parameters values in Table \ref{table:bounds}. The corresponding Pixels are shown in Figure \ref{fig:result}. Any arbitrary section of the Table can be found in the same way if the $x$,$y$ and $z$ coordinates are known, 4 sections of the Table and corresponding Pixels are shown in Figure \ref{fig:multi_table}.
+\\
+\newline
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{images/found_table.png}
+\caption{A grid of Pixels corresponding to every 10cm across and down the tables}\label{fig:result}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \subfloat[ $x \in {[-0.25,0.25]}$, $y \in {[1.2,2.4]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table2.png}}}%
+    \qquad
+    \subfloat[ $x \in {[-0.25,-0.05]}$, $y \in {[0,1.2]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table3.png} }}%
+	\\
+    \subfloat[ $x \in {[0,0.25]}$, $y \in {[0.6,1.2]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table4.png} }}%
+    \qquad
+    \subfloat[ $x \in {[-0.15,0.15]}$, $y \in {[1.2,2.4]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table5.png} }}%
+    \caption{Pixels correpsonding to various sections of the Table}%
+    \label{fig:multi_table}%
+\end{figure}
+
+
+\begin{thebibliography}{9}
+\bibitem{rotations}
+Arvo, J., 1992. Fast random rotation matrices. In Graphics Gems III (IBM Version) (pp. 117-120).
+\bibitem{pinholeModel} 
+Bradski, G. and Kaehler, A., 2000. OpenCV. Dr. Dobb’s journal of software tools, 3.
+\end{thebibliography}
+
+\end{document}
