@@ -7,16 +7,16 @@ I = imread(img_file);
 imshow(I);
 hold on
 
-dL1Lambda = 0.9;
-dL2Lambda = 1.4;
+dL1Lambda = 1.5;
+dL2Lambda = 0.5;
 
 params = config();
 
-alpha = 5;
-gamma = 0.3;
+alpha = 0;
+gamma = 0;
 
 X = -2.22:0.5:1.65;
-Y = 16.4:55.7;
+Y = 16.4:100;
 Z = -2.5;
 
 for x = X
