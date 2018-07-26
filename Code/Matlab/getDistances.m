@@ -8,8 +8,8 @@ light2 = toCameraCoords([471268.121; 105939.688; 0],theta);
 % I have to co-ordinates of where the photo was taken from, however, this
 % doesn't account for the fixing. I can actually
 photo = toCameraCoords([471321.89; 105924.91; 0],theta);
-shoulder0 = toCameraCoords([471316.158; 105923.598; 0],theta);
-lane_marker0 = toCameraCoords([471316.635; 105927.448; 0],theta);
+shoulder0 = toCameraCoords([471313.404; 105923.927; 0],theta);
+lane_marker0 = toCameraCoords([471314.413; 105927.25; 0],theta);
 % Euclidean Distances
 photo2light1 = norm(photo-light1);
 photo2light2 = norm(photo-light2);
