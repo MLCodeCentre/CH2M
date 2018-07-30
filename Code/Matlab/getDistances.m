@@ -28,4 +28,9 @@ disp(strcat(['Distance hard shoulder to lane marker at Y=0: ',num2str(lane2shoul
 disp(strcat(['Distance photo to lane marker at Y=0: ',num2str(lane2photo),'m']))
 disp(strcat(['Distance photo to shoulder at Y=0: ',num2str(shoulder2photo),'m']))
 
-
+disp('New distances')
+chevron1 = toCameraCoords([471316.455; 105927.45; 0], theta);
+square = toCameraCoords([471294.125; 105930.699; 0], theta);
+chevron1 - photo
+square - photo
+shoulder0 - photo
