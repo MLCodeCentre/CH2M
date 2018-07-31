@@ -9,23 +9,23 @@ camera_pos = [0,0,cam_height];
 stickyNotesData = readtable(fullfile(dataDir(),'Experiment','StickyNotes.csv'));
 
 
-plotCamera('Location',camera_pos,'Orientation',rotx(90),'Size',0.05)
+% plotCamera('Location',camera_pos,'Orientation',rotx(90),'Size',0.05)
 
-hold on
+% hold on
 
 num_stickyNotes = size(stickyNotesData,1);
-for row_ind = 1:num_stickyNotes
-   row = stickyNotesData(row_ind,:);
-   plot3(row.X,row.Y,0,'ro')
-   text(row.X,row.Y,0,num2str(row_ind),'fontSize',14)
-   hold on
-end
+% for row_ind = 1:num_stickyNotes
+%    row = stickyNotesData(row_ind,:);
+%    plot3(row.X,row.Y,0,'ro')
+%    text(row.X,row.Y,0,num2str(row_ind),'fontSize',14)
+%    hold on
+% end
 
-xlabel('X[m]')
-ylabel('Y[m]')
-zlabel('Z[m]')
-grid on
-axis equal
+% xlabel('X[m]')
+% ylabel('Y[m]')
+% zlabel('Z[m]')
+% grid on
+% axis equal
 
 figure;
 
