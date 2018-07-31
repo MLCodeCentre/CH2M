@@ -8,14 +8,16 @@ light2 = toCameraCoords([471268.121; 105939.688; 0],theta);
 % I have to co-ordinates of where the photo was taken from, however, this
 % doesn't account for the fixing. I can actually
 photo = toCameraCoords([471321.89; 105924.91; 0],theta);
-shoulder0 = toCameraCoords([471316.158; 105923.598; 0],theta);
-lane_marker0 = toCameraCoords([471316.635; 105927.448; 0],theta);
+shoulder0 = toCameraCoords([471313.404; 105923.927; 0],theta);
+lane_marker0 = toCameraCoords([471314.413; 105927.25; 0],theta);
+shoulder0-photo
+lane_marker0-photo
 % Euclidean Distances
 photo2light1 = norm(photo-light1);
 photo2light2 = norm(photo-light2);
 light12light2 = norm(light1-light2);
 lane2shoulder = norm(lane_marker0-shoulder0);
-lane2photo = norm();
+lane2photo = norm(lane_marker0-photo);
 shoulder2photo = norm(shoulder0-photo);
 
 
@@ -26,4 +28,9 @@ disp(strcat(['Distance hard shoulder to lane marker at Y=0: ',num2str(lane2shoul
 disp(strcat(['Distance photo to lane marker at Y=0: ',num2str(lane2photo),'m']))
 disp(strcat(['Distance photo to shoulder at Y=0: ',num2str(shoulder2photo),'m']))
 
-
+disp('New distances')
+chevron1 = toCameraCoords([471316.455; 105927.45; 0], theta);
+square = toCameraCoords([471294.125; 105930.699; 0], theta);
+chevron1 - photo
+square - photo
+shoulder0 - photo
