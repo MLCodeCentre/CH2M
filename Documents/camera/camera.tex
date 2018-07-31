@@ -15,12 +15,23 @@
 \begin{document}
 \maketitle
 
+% ------------------------------------------------------------------
+% ---------------------------Introduction---------------------------
+% ------------------------------------------------------------------
+
 \section{Introduction}
-This report describes a novel method for transforming a coordinate in three-dimensional space $(x,y,z)$ into pixels $ (u,v)$ in a digital image taken by a camera. Equations that express the pixels parameterised by the camera's intrinsic and extrinsic parameters are derived from first principles, from these the vanishing point special case is found. It is shown that the parameters can be solved with knowledge of 2 sets of coordinates and corresponding pixels, and the vanishing point. This methodology is validated via an experiment in which a photograph of a table is taken at a known position and the camera parameters are consequently solved, it is then shown that any section of the table can be found using the solved parameters. 
+This report describes a novel method for transforming a coordinate in three-dimensional space $(x,y,z)$ into pixels $ (u,v)$ in a digital image taken by a camera. Equations that express $u$ and $v$ as a function of $(x,y,z)$ parameterised by the camera's intrinsic and extrinsic parameters $\alpha$, $\beta$, $\gamma$, $L_1$ and $L_2$ are derived from first principles, from these the vanishing point special case is found. It is shown that the parameters can be solved with knowledge of two sets of coordinates and corresponding pixels, and the vanishing point. This methodology is validated via an experiment in which a photograph of a table is taken at a known position and the camera parameters are consequently solved.
+
+% ------------------------------------------------------------------
+% ------------------------------Method------------------------------
+% ------------------------------------------------------------------
 
 \section{Method}
+
+% ------------------------------Coordinate Transformation------------------------------
+
 \subsection{Coordinate Transformation} 
-Let us define the world  coordinate system $(x,y,z)$ and the camera coordinate system $ (e_1,e_2,e_3)$. The camera is located at $\textbf{c} = (x_c,y_c,z_c)$ and is assumed to be known as shown in Figure \ref{fig:axis}. The coordinate $\textbf{p} = (x_p,y_p,z_p)$ is transformed into the camera coordinate system by translating such that $\textbf{c}$ is at the origin, and rotating through the roll $(\alpha)$, tilt $(\beta)$ and pan $(\gamma)$  angles of the camera; around the $x$,$y$ and $z$ axes respectively. The rotations are the non-commutative SO(3) Rotation Group Matrices \cite{rotations}, therefore:
+Let us define the camera coordinate system $ (e_1,e_2,e_3)$. The camera is located at $\textbf{c} = (x_c,y_c,z_c)$ and is assumed to be known as shown in Figure \ref{fig:axis}. The coordinate $\textbf{p} = (x_p,y_p,z_p)$ is transformed into the camera coordinate system by translating such that $\textbf{c}$ is at the origin and rotating through the roll $(\alpha)$, tilt $(\beta)$ and pan $(\gamma)$ angles of the camera, around the $x$,$y$ and $z$ axes respectively. The rotations are the non-commutative SO(3) Rotation Group Matrices \cite{rotations}, therefore:
 
 \begin{align}
 \textbf{p}_c & = 
@@ -53,7 +64,6 @@ where
 \end{bmatrix}.
 \end{equation}
 
-
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.7\linewidth]{images/axis.pdf}
@@ -62,16 +72,18 @@ where
 
 In the case where $c = (0,0,0)$ and $\alpha = \beta = \gamma = 0$, then  $(x,y,z) = (e_1,e_2,e_3)$  and  $\textbf{p} = \textbf{p}_c$. The rest of the report considers transforming $\textbf{p}_c$ into pixels $(u,v)$ on a digital image taken by the camera.
 
+% ------------------------------Collapsing onto Planes------------------------------
+
 \subsection{Collapsing onto Planes}
 
-The image taken by the camera is orthogonal to $e_1$, also known as the Optical Axis. The position of $\textbf{p}_c$ in the $(e_2,e_3)$ plane are the components of $\textbf{p}_c$ in the $(e_1,e_2)$ plane $\textbf{p}_{12}$, and in the $(e_1,e_3)$ plane $\textbf{p}_{13}$ where,
+The image taken by the camera is orthogonal to $e_1$, also known as the optical axis. The position of $\textbf{p}_c$ in the $(e_2,e_3)$ plane are its components in the $(e_1,e_2)$ plane $\textbf{p}_{12}$, and in the $(e_1,e_3)$ plane $\textbf{p}_{13}$ where,
 
 $$\textbf{p}_{12} =\textbf{p}_c - (\textbf{p}_c \cdot e_3)e_3$$
 and
 $$\textbf{p}_{13} =\textbf{p}_c - (\textbf{p}_c \cdot e_2)e_2.$$
 
 
-The vectors $\textbf{p}_{13}$ and $\textbf{p}_{23}$ make the angles $\psi$ and $\phi$ with $e_1$ respectively.
+The vectors $\textbf{p}_{13}$ and $\textbf{p}_{23}$ make angles $\psi$ and $\phi$ with $e_1$ respectively.
 
 \begin{figure}[h]
 \centering
@@ -79,20 +91,23 @@ The vectors $\textbf{p}_{13}$ and $\textbf{p}_{23}$ make the angles $\psi$ and $
 \caption{The components of $\textbf{p}_c$ in the $(e_1,e_2)$ and $(e_1,e_3)$ planes.}\label{fig:planes}
 \end{figure}
 
+% ------------------------------Onto the Image Plane------------------------------
+
 \subsection{Onto the Image Plane}\label{ontotheplane}
 
-The camera is assumed to be a pinhole camera \cite{pinholeModel}, the origin of the camera coordinate system $c$ is at the lens. $\textbf{p}_c$ is projected through the lens onto the image plane inside the camera, the focal length $\lambda$ is the distance from the lens to the image plane which has size $L_1 \times L_2$. Consider the camera in the $(e_1,e_3)$ plane shown in Figure \ref{fig:pinhole}. The vector $\textbf{p}_c$ is projected to height $h$ on the image plane, via trigonometry $h = \lambda\tan\psi$. Identically, the projection of $\textbf{p}_c$ to width $w$ on the image plane in the $(e_1,e_2)$ plane is $w = \lambda\tan\phi$.
+The camera is assumed to be a pinhole camera \cite{pinholeModel}. The origin of the camera coordinate system $c$ is at the lens and the focal length $\lambda$ is the distance from the lens to the image plane which has size $L_1 \times L_2$. Consider the camera in the $(e_1,e_3)$ plane shown in Figure \ref{fig:pinhole}, the vector $\textbf{p}_c$ is projected to height $h$ on the image plane. Via trigonometry $h = \lambda\tan\psi$, identically the projection of $\textbf{p}_c$ to width $w$ on the image plane in the $(e_1,e_2)$ plane is $w = \lambda\tan\phi$.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.58\linewidth]{images/pinhole.pdf}
-\caption{Projection of $\textbf{P}_c$ onto the image plane through a pinhole camera}\label{fig:pinhole}
+\caption{Projection of $\textbf{P}_c$ to $h$ on the image plane through a pinhole camera in the $(e_1,e_3)$ plane. The image plane has size $L_1\times L_2$ and the camera has focal length $\lambda$.}\label{fig:pinhole}
 \end{figure}
 
+% ------------------------------From the Image Plane to Pixels------------------------------
 
 \subsection{From the Image Plane to Pixels}
 
-Assuming perfectly square identical pixels throughout the digital image, we now describe the transformation from width and height $(w,h)$ on the image plane to pixel coordinate $(u,v)$ on an image of size $m\times n$ pixels. There are $m$ pixels equally spaced along length $L_1$ and $n$ pixels along $L_2$ therefore,
+Assuming perfectly square identical pixels throughout the digital image, we now describe the transformation from width and height $(w,h)$ on the image plane to pixels $(u,v)$ on a digital image of size $m\times n$. There are $m$ pixels equally spaced along length $L_1$ and $n$ pixels along $L_2$ therefore,
 
 $$
 u = \frac{m}{L_1}w = m\frac{\lambda}{L_1}\tan\phi
@@ -106,7 +121,7 @@ v = \frac{n}{L_2}h=n\frac{\lambda}{L_2}{\tan\psi}
 \bigg[\frac{\textbf{p}_{13}\cdot e_3}{\textbf{p}_{13}\cdot e_1}\bigg].
 $$
 
-Expressing these in terms of the pitch, pan and tilt angles in matrix $\mtx{R}$ and world coordinates $(x,y,z)$ yields the following Equations \ref{u} and \ref{v} that describe the pixel coordinates as a function of a position in the world $(u(x,y,z),v(x,y,z))$ parameterised by the extrinsic camera parameters $\gamma, \beta$ and $\alpha$, and the intrinsic camera parameters $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+Expressing these in terms of the pitch, pan and tilt angles in matrix $\mtx{R}$ and world coordinates $(x,y,z)$ gives the following equations that describe the pixels as a function of a coordinate in the world $(u(x,y,z),v(x,y,z))$ parameterised by the extrinsic camera parameters $\alpha, \beta$ and $\gamma$, and the intrinsic camera parameters $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
 
 \begin{equation}\label{u}
 u(x,y,z) = m\frac{\lambda}{L_1}
@@ -120,6 +135,7 @@ v(x,y,z)= n\frac{\lambda}{L_2}
 {\mtx{R}_{11}x+ \mtx{R}_{12}y + \mtx{R}_{13}z} \bigg]
 \end{equation}
 
+% ------------------------------Vanishing Points------------------------------
 
 \subsubsection{Vanishing Points}
 
@@ -137,13 +153,17 @@ v_p = \lim_{x\to\infty} v(x,y,z) = n\frac{\lambda}{L_2}
 {\mtx{R}_{11}} \bigg]
 \end{equation}
 
-Equations \ref{u},\ref{v},\ref{up} and \ref{vp} form a set of 4 equations to be solved for 5 parameters, and therefore represent an under-determined system. Consequently 2 corresponding pairs of world coordinates and pixels are required thus forming 6 equations to over-determine the system and solve for $\gamma$,$\beta$,$\alpha$,$\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+Equations \ref{u},\ref{v},\ref{up} and \ref{vp} form a set of 4 equations to be solved for 5 parameters, and therefore represent an under-determined system. Consequently 2 corresponding pairs of world coordinates and pixels are required thus forming 6 equations to over-determine the system and solve for $\gamma$, $\beta$, $\alpha$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+
+% -----------------------------------------------------------------------
+% ------------------------------Experiment-------------------------------
+% -----------------------------------------------------------------------
 
 \section{Experiment}
 
-An experiment was undertaken to validate the methods described in this report, an iPhone 6 camera was placed on a stand at a height of 0.205m at the end of 2 joined tables each 50cm in width and 120cm in length.\\
+An experiment was undertaken to validate the methods described in this report, an iPhone 6 camera was placed on a stand at a height of 0.205m at the end of two joined tables each 50cm in width and 120cm in length.\\
 
-The corners where the 2 tables meet, and the corners at the end of the second table are reliable world coordinates. The experiment setup and 4 coordinates are shown in Figure \ref{fig:experiment}. Taking the end where the camera was placed, half way across the table, and the table height as the origin of the world coordinate origin, the corresponding coordinates and pixels of the table corners are shown in Table \ref{table:1}. By inspection, the vanishing point is found to be $(10,221)$. 
+The corners where the two tables meet, and the corners at the end of the second table are reliable world coordinates. The experiment setup and four coordinates are shown in Figure \ref{fig:experiment}. Taking the end where the camera was placed, half way across the table, and the table height as the origin of the world coordinate origin, the corresponding coordinates and pixels of the table corners are shown in Table \ref{table:1}. By inspection, the vanishing point is found to be $(10,221)$. 
 \newline
 
 \begin{figure}[h]
@@ -169,7 +189,7 @@ Corner & $x$[m] & $y$[m] & $z$[m] &$u$ & $v$\\
 \label{table:1}
 \end{table}
 
-We now solve the 5 system parameters with 6 equations: Equations \ref{u} and \ref{v} for the world and pixel coordinates of the first and last corners and Equations \ref{up} and \ref{vp} for the vanishing point. The \texttt{fsolve()} numerical equation solver in Matlab is used to solve the parameters values shown in Table \ref{table:results}.
+We now solve the 5 system parameters with 6 equations: Equations \ref{u} and \ref{v} for the world coordinates and pixels of corners 1 and 4, and Equations \ref{up} and \ref{vp} for the vanishing point. The \texttt{fsolve} numerical equation solver in Matlab is used to solve the parameters values shown in Table \ref{table:results}.
 
 
 \begin{table}[!htb]
@@ -185,10 +205,13 @@ Value & 0.071 & 0.005 & 0.007 & 0.835 & 1.146 \\
 \label{table:results}
 \end{table}
 
+% ------------------------------Validation-------------------------------
+
 \subsection{Validation}
-We can validate the results by finding pixels for a set of world coordinates that are known. Consider the table that the camera is fixed to, it is a continuous set of coordinates $(x,y,z)$ where $x \in \left[0,2.4\right]$,  $y \in \left[-2.5,2.5\right]$, and $z=-0.21$.  The corresponding set of pixels for the table coordinates are then found using Equations \ref{u} and \ref{v} with the parameters values in Table \ref{table:results}. The table pixels are shown in Figure \ref{fig:result}. Any arbitrary section of the table can be found in the same way if the $x$,$y$ and $z$ coordinates are known, 4 sections of the table and corresponding pixels are shown in Figure \ref{fig:multi_table}.
-\\
-\newline
+We can validate the results by finding pixels for a set of world coordinates that are known. Consider the table that the camera is fixed to, it is a continuous set of coordinates $(x,y,z)$ where $x \in \left[0,2.4\right]$,  $y \in \left[-2.5,2.5\right]$, and $z=-0.21$.  The corresponding set of pixels for the table coordinates are then found using Equations \ref{u} and \ref{v} with the parameters values in Table \ref{table:results}. The table pixels are shown in Figure \ref{fig:result}. \\
+
+Any arbitrary section of the table can be found in the same way if the $x$,$y$ and $z$ coordinates are known, four sections of the table and corresponding pixels are shown in Figure \ref{fig:multi_table}.
+
 
 \begin{figure}[h]
 \centering
