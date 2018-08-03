@@ -15,16 +15,16 @@
 \begin{document}
 \maketitle
 
-% ------------------------------------------------------------------
+% ---------------------------------------------------------------------
 % ---------------------------Introduction---------------------------
-% ------------------------------------------------------------------
+% ---------------------------------------------------------------------
 
 \section{Introduction}
 This report describes a novel method for transforming a coordinate in three-dimensional space $(x,y,z)$ into pixels $ (u,v)$ in a digital image taken by a camera. Equations that express $u$ and $v$ as a function of $(x,y,z)$ parameterised by the camera's intrinsic and extrinsic parameters $\alpha$, $\beta$, $\gamma$, $L_1$ and $L_2$ are derived from first principles, from these the vanishing point special case is found. It is shown that the parameters can be solved with knowledge of two sets of coordinates and corresponding pixels, and the vanishing point. This methodology is validated via an experiment in which a photograph of a table is taken at a known position and the camera parameters are consequently solved.
 
-% ------------------------------------------------------------------
+% ---------------------------------------------------------------------
 % ------------------------------Method------------------------------
-% ------------------------------------------------------------------
+% ---------------------------------------------------------------------
 
 \section{Method}
 
@@ -155,9 +155,9 @@ v_p = \lim_{x\to\infty} v(x,y,z) = n\frac{\lambda}{L_2}
 
 Equations \ref{u},\ref{v},\ref{up} and \ref{vp} form a set of 4 equations to be solved for 5 parameters, and therefore represent an under-determined system. Consequently 2 corresponding pairs of world coordinates and pixels are required thus forming 6 equations to over-determine the system and solve for $\gamma$, $\beta$, $\alpha$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
 
-% -----------------------------------------------------------------------
+% --------------------------------------------------------------------------
 % ------------------------------Experiment-------------------------------
-% -----------------------------------------------------------------------
+% --------------------------------------------------------------------------
 
 \section{Experiment}
 

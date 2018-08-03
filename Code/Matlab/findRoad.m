@@ -3,7 +3,7 @@ function findRoad(X)
 close all;
 
 img_file = fullfile(dataDir(),'A27','Year2','Images','2_2367_1174.jpg');
-%img_file = fullfile(dataDir(),'A27','Year2','Images','2_2369_183.jpg');
+%img_file = fullfile(dataDir(),'A27','Year2','Images','2_2369_8551.jpg');
 
 I = imread(img_file);
 imshow(I);
@@ -25,10 +25,10 @@ R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*
 params = config();
 
 % define table co-ordinates relative to the camera
-X = 5:28;
+X = 6:28;
 X = X - params.r2;
 
-Y = -2.34:0.2:1.62;
+Y = -2.34:0.2:1.92;
 z = -h;
 
 m = 2560; cx = 1280; % >

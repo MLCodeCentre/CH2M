@@ -4,21 +4,25 @@ function roadSLAMDataCollection
 % click on the target in the photos, the coordinates of the target relative
 % to the car heading are calculated and pixels collected from the click
 
-% THE TARGET IS.. THE SECOND SMALL SQUARE IN THE ROAD WHICH HAS (N,E,Z)
+% THE 1ST TARGET IS.. THE SECOND WHITE SMALL SQUARE IN THE ROAD WHICH HAS (N,E,Z)
 % coords (471321.89, 105924.91, 0)
-target = [471294.125; 105930.699; 0];
+% THE 2ND TARGET IS.. THE SECOND ORANGE SMALL SQUARE IN THE HARDSHOULDER WHICH HAS (N,E,Z)
+% coords (471302.306, 105925.435, 0)
+
+target_1 = [471076.52; 105975.56; 0]; %lane marker sqaure
+target_2 = [471070.567; 105978.642; 0]; %
 
 close all
 nav_data = readtable(fullfile(dataDir(),'A27','Year2','Nav','Nav.csv'));
 
 camera = 2;
-PCDATE = 2367;
-PCTIMES = 1170:1182;
+PCDATE = 2369;
+PCTIMES = 8551:2:8570;
 
 h = 3;
 
 num_files = length(PCTIMES);
-data_points = zeros(num_files,5);
+data_points = zeros(2*num_files,5);
 
 disp('click on the target for each photo')
 
@@ -31,19 +35,24 @@ for ind = 1:num_files
     photo = [image_nav.XCOORD; image_nav.YCOORD; h];
     theta = image_nav.HEADING;
     %Pw - position in (N,E,Z)
-    Pw = target - photo;
+    Pw1 = target_1 - photo;
+    Pw2 = target_2 - photo;
     %Pc - position in camera coords
-    Pc = toCameraCoords(Pw,theta);
+    Pc1 = toCameraCoords(Pw1,theta);
+    Pc2 = toCameraCoords(Pw2,theta);
        
     %% getting U,V from click info
     full_image_file = fullfile(dataDir(),'A27','Year2','Images',image_file);
     I = imread(full_image_file);
     imshow(I);
-    [u,v] = ginput(1);
-    u = ceil(u);
-    v = ceil(v);
+    [U,V] = ginput(2);
+    u1 = ceil(U(1));
+    v1 = ceil(V(1));
+    u2 = ceil(U(2));
+    v2 = ceil(V(2));
     
-    data_points(ind,:) = [Pc(2),Pc(1),Pc(3),u,v]
+    data_points(2*ind-1,:) = [Pc1(2),Pc1(1),Pc1(3),u1,v1]
+    data_points(2*ind,:)   = [Pc2(2),Pc2(1),Pc2(3),u2,v2]
 end
 
 disp('saving table to target_data.csv')
