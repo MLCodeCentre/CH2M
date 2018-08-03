@@ -251,24 +251,80 @@ Firstly we consider changes to the pan angle, $\gamma$. Suppose the pan angle un
  \end{bmatrix}
 \end{equation}
 
-Recall Equation \ref{u} that describes the pixel $u$ as a function of $(x,y,z)$ parameterised by $\alpha$, $\beta$, $\gamma$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$, we can find the change $u + \delta u$ by substituting $\mtx{R} + \delta\mtx{R}$ for $\mtx{R}$ in to the equation as shown in Equation \ref{du} below.
+Recall Equation \ref{u} that describes the pixel $u$ as a function of $(x,y,z)$ parameterised by $\alpha$, $\beta$, $\gamma$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$, we can find the change $u + \delta u$ by substituting $\mtx{R} + \delta\mtx{R}$ for $\mtx{R}$ in to the equation as shown in Equation \ref{dugamma} below.
 
-\begin{equation}\label{du}
+\begin{equation}\label{dugamma}
     u + \delta u = m\frac{\lambda}{L_1}
-        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}y)\cos\delta\gamma 
-                  + (\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}y)\sin\delta\gamma}
-                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}y)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}y)\sin\delta\gamma}                  
+        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\gamma 
+                  + (\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\sin\delta\gamma}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
         \bigg]
 \end{equation}
 
-We can see that as the angle change tends to zero, then Equation \ref{du} tends to the original pixel equation. Therefore: $\lim_{\delta\gamma \to 0} u + \delta u = u$. Identically for pixel $v$:
+As the angle change tends to zero, then Equation \ref{dugamma} tends to the original pixel equation. Therefore: $\lim_{\delta\gamma \to 0} u + \delta u = u$. Identically for pixel $v$:
 
-\begin{equation}\label{dv}
+\begin{equation}\label{dvgamma}
     v + \delta v = n\frac{\lambda}{L_2}
-        \bigg[\frac{\mtx{R}_{31}x + \mtx{R}_{22}y + \mtx{R}_{23}y}
-                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}y)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}y)\sin\delta\gamma}                  
+        \bigg[\frac{\mtx{R}_{31}x + \mtx{R}_{22}y + \mtx{R}_{23}z}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
         \bigg]
 \end{equation}
+
+\subsection{Tilt Angle}
+
+We can perform the same analysis on the changes to the tilt angle $\beta$. We find the following changes to the pixels with a change in tilt angle:
+
+\begin{equation}\label{dubeta}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\beta 
+                  + \epsilon_2\sin\delta\beta}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\beta
+                  + \epsilon_1\sin\delta\beta}                  
+        \bigg]
+\end{equation}
+\begin{equation}\label{dvbeta}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{(\mtx{R}_{31}x + \mtx{R}_{32}y + \mtx{R}_{33}z)\cos\delta\beta 
+                  + \epsilon_3\sin\delta\beta}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\beta
+                  + \epsilon_1\sin\delta\beta}                  
+        \bigg]
+\end{equation}
+
+where
+$$
+\epsilon_1 = -(\cos\gamma\sin\beta)x + (\cos\gamma\cos\beta\sin\alpha) y + (\cos\cos\beta\cos\alpha) z,
+$$
+$$
+\epsilon_2 = -(\sin\gamma\sin\beta)x + (\sin\gamma\cos\beta\sin\alpha) y + (\sin\cos\beta\cos\alpha) z
+$$
+and
+$$
+\epsilon_2 = (\cos\beta)x - (\sin\beta\sin\alpha) y - (\sin\beta\cos\alpha) z.
+$$
+
+\subsection{Roll Angle}
+
+Finally the the pixel changes for a change in roll angle $\alpha$ is given below.
+
+\begin{equation}\label{dualpha}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{\mtx{R}_{21}x + (\mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\alpha 
+                   +(\mtx{R}_{23}y - \mtx{R}_{22}z)\sin\delta\alpha}
+                   {\mtx{R}_{11}x + (\mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\alpha 
+                   +(\mtx{R}_{13}y - \mtx{R}_{12}z)\sin\delta\alpha}                  
+        \bigg]
+\end{equation}
+
+\begin{equation}\label{dvalpha}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{\mtx{R}_{31}x + (\mtx{R}_{32}y + \mtx{R}_{33}z)\cos\delta\alpha 
+                   +(\mtx{R}_{33}y - \mtx{R}_{32}z)\sin\delta\alpha}
+                   {\mtx{R}_{11}x + (\mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\alpha 
+                   +(\mtx{R}_{13}y - \mtx{R}_{12}z)\sin\delta\alpha}                  
+        \bigg]
+\end{equation}
+
 
 \begin{thebibliography}{9}
 \bibitem{rotations}
