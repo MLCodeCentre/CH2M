@@ -232,6 +232,99 @@ Any arbitrary section of the table can be found in the same way if the $x$,$y$ a
     \label{fig:multi_table}%
 \end{figure}
 
+% ------------------------------Sensitivity Analysis-------------------------------
+\section{Sensitivity Analysis}
+
+We now consider the effect on the pixels a change in each of the 5 parameters makes, this allows us to better understand how errors in the parameter calculations effect the accuracy of Equations \ref{u} and \ref{v}.
+
+\subsection{Pan Angle}
+Firstly we consider changes to the pan angle, $\gamma$. Suppose the pan angle undergoes a change $\delta\gamma$ such that $\gamma \rightarrow \gamma + \delta\gamma$. By the double angle formulas, $\sin\gamma\rightarrow\sin\gamma\cos\delta\gamma + \cos\gamma\sin\delta\gamma$ and $\cos\gamma\rightarrow\cos\gamma\cos\delta\gamma - \sin\gamma\sin\delta\gamma$. We can then find the change the full rotation matrix.
+
+\begin{equation}
+ \mtx{R} + \delta\mtx{R} =
+  \begin{bmatrix}
+    \mtx{R}_{11}\cos\delta\gamma - \mtx{R}_{21}\sin\delta\gamma & \mtx{R}_{12}\cos\delta\gamma - \mtx{R}_{22}\sin\delta\gamma & \mtx{R}_{13}\cos\delta\gamma - \mtx{R}_{23}\sin\delta\gamma \\
+
+    \mtx{R}_{21}\cos\delta\gamma + \mtx{R}_{11}\sin\delta\gamma & \mtx{R}_{22}\cos\delta\gamma + \mtx{R}_{12}\sin\delta\gamma & \mtx{R}_{23}\cos\delta\gamma + \mtx{R}_{13}\sin\delta\gamma \\
+
+    \mtx{R}_{31} & \mtx{R}_{32} & \mtx{R}_{33}
+ \end{bmatrix}
+\end{equation}
+
+Recall Equation \ref{u} that describes the pixel $u$ as a function of $(x,y,z)$ parameterised by $\alpha$, $\beta$, $\gamma$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$, we can find the change $u + \delta u$ by substituting $\mtx{R} + \delta\mtx{R}$ for $\mtx{R}$ in to the equation as shown in Equation \ref{dugamma} below.
+
+\begin{equation}\label{dugamma}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\gamma 
+                  + (\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\sin\delta\gamma}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
+        \bigg]
+\end{equation}
+
+As the angle change tends to zero, then Equation \ref{dugamma} tends to the original pixel equation. Therefore: $\lim_{\delta\gamma \to 0} u + \delta u = u$. Identically for pixel $v$:
+
+\begin{equation}\label{dvgamma}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{\mtx{R}_{31}x + \mtx{R}_{22}y + \mtx{R}_{23}z}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
+        \bigg]
+\end{equation}
+
+\subsection{Tilt Angle}
+
+We can perform the same analysis on the changes to the tilt angle $\beta$. We find the following changes to the pixels with a change in tilt angle:
+
+\begin{equation}\label{dubeta}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\beta 
+                  + \epsilon_2\sin\delta\beta}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\beta
+                  + \epsilon_1\sin\delta\beta}                  
+        \bigg]
+\end{equation}
+\begin{equation}\label{dvbeta}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{(\mtx{R}_{31}x + \mtx{R}_{32}y + \mtx{R}_{33}z)\cos\delta\beta 
+                  + \epsilon_3\sin\delta\beta}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\beta
+                  + \epsilon_1\sin\delta\beta}                  
+        \bigg]
+\end{equation}
+
+where
+$$
+\epsilon_1 = -(\cos\gamma\sin\beta)x + (\cos\gamma\cos\beta\sin\alpha) y + (\cos\cos\beta\cos\alpha) z,
+$$
+$$
+\epsilon_2 = -(\sin\gamma\sin\beta)x + (\sin\gamma\cos\beta\sin\alpha) y + (\sin\cos\beta\cos\alpha) z
+$$
+and
+$$
+\epsilon_2 = (\cos\beta)x - (\sin\beta\sin\alpha) y - (\sin\beta\cos\alpha) z.
+$$
+
+\subsection{Roll Angle}
+
+Finally the the pixel changes for a change in roll angle $\alpha$ is given below.
+
+\begin{equation}\label{dualpha}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{\mtx{R}_{21}x + (\mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\alpha 
+                   +(\mtx{R}_{23}y - \mtx{R}_{22}z)\sin\delta\alpha}
+                   {\mtx{R}_{11}x + (\mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\alpha 
+                   +(\mtx{R}_{13}y - \mtx{R}_{12}z)\sin\delta\alpha}                  
+        \bigg]
+\end{equation}
+
+\begin{equation}\label{dvalpha}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{\mtx{R}_{31}x + (\mtx{R}_{32}y + \mtx{R}_{33}z)\cos\delta\alpha 
+                   +(\mtx{R}_{33}y - \mtx{R}_{32}z)\sin\delta\alpha}
+                   {\mtx{R}_{11}x + (\mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\alpha 
+                   +(\mtx{R}_{13}y - \mtx{R}_{12}z)\sin\delta\alpha}                  
+        \bigg]
+\end{equation}
+
 
 \begin{thebibliography}{9}
 \bibitem{rotations}
