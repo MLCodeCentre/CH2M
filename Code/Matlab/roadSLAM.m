@@ -10,7 +10,8 @@ num_rows = size(data_points,1);
 h = 2.5;
 Xs = zeros(num_rows,5);
 
-for D = 10:20
+for D = 1:3:18
+    D
     data_point = data_points(1:D,:);
     U = data_point.u;
     V = data_point.v;
@@ -18,8 +19,9 @@ for D = 10:20
     Y = data_point.y;
     Z = -h*ones(size(U));
     
-    %   options = optimoptions('lsqnonlin','Display','iter');
-    [X,resnorm,res]  = lsqnonlin(@(params)cameraEquationsSLAM(params,U,V,X,Y,Z),[0,0,0,1,1,3],[],[])
+     options = optimoptions('lsqnonlin','FunctionTolerance',1e-10);
+    [X,resnorm,residual,exitflag,output,lambda,jacobian]  = lsqnonlin(@(params)cameraEquationsSLAM(params,U,V,X,Y,Z),[0.1,0.1,0.1,1,1,3],[],[]);
+    exitflag
     
     findRoad(X)
     %[X,FVAL,EXITFLAG] = fsolve(@(x) cameraEquationsSLAM(x,data_points,D), [0.2,0.2,0.2,1,1], options);

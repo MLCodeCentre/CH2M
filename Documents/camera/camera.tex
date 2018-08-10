@@ -124,16 +124,18 @@ $$
 Expressing these in terms of the pitch, pan and tilt angles in matrix $\mtx{R}$ and world coordinates $(x,y,z)$ gives the following equations that describe the pixels as a function of a coordinate in the world $(u(x,y,z),v(x,y,z))$ parameterised by the extrinsic camera parameters $\alpha, \beta$ and $\gamma$, and the intrinsic camera parameters $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
 
 \begin{equation}\label{u}
-u(x,y,z) = m\frac{\lambda}{L_1}
+u(x,y,z;\theta) = m\frac{\lambda}{L_1}
 \bigg[ \frac{\mtx{R}_{21}x+ \mtx{R}_{22}y + \mtx{R}_{23}z}
 {\mtx{R}_{11}x+ \mtx{R}_{12}y + \mtx{R}_{13}z} \bigg]
 \end{equation}
 
 \begin{equation}\label{v}
-v(x,y,z)= n\frac{\lambda}{L_2}
+v(x,y,z;\theta)= n\frac{\lambda}{L_2}
 \bigg[ \frac{\mtx{R}_{31}x+ \mtx{R}_{32}y + \mtx{R}_{33}z}
 {\mtx{R}_{11}x+ \mtx{R}_{12}y + \mtx{R}_{13}z} \bigg]
 \end{equation}
+
+Where $\theta=[\alpha,\beta,\gamma,\frac{\lambda}{L_1},\frac{\lambda}{L_2}]$.
 
 % ------------------------------Vanishing Points------------------------------
 
@@ -142,13 +144,13 @@ v(x,y,z)= n\frac{\lambda}{L_2}
 The vanishing point in a digital image are the pixels at which all parallel lines orthogonal to the  $(e_2,e_3)$ plane converge and can be found by inspection of the image. Let us denote this pixel pair as $(u_p, v_p)$, it follows then that:
 
 \begin{equation}\label{up}
-u_p = \lim_{x\to\infty} u(x,y,z) = m\frac{\lambda}{L_1}
+u_p = \lim_{x\to\infty} u(x,y,z;\theta) = m\frac{\lambda}{L_1}
 \bigg[\frac{\mtx{R}_{21}}
 {\mtx{R}_{11}} \bigg]
 \end{equation}
 
 \begin{equation}\label{vp}
-v_p = \lim_{x\to\infty} v(x,y,z) = n\frac{\lambda}{L_2}
+v_p = \lim_{x\to\infty} v(x,y,z;\theta) = n\frac{\lambda}{L_2}
 \bigg[\frac{\mtx{R}_{31}}
 {\mtx{R}_{11}} \bigg]
 \end{equation}
@@ -178,10 +180,10 @@ The corners where the two tables meet, and the corners at the end of the second 
 \hline
 Corner & $x$[m] & $y$[m] & $z$[m] &$u$ & $v$\\
 \hline
-1 & -0.25 & 1.20 &-0.205 & 1293 & 1852 \\
-2 & 0.25 & 1.20 & -0.205 & 2692 & 1866 \\
-3 & -0.25 & 2.40 & -0.205 & 1642 & 1563 \\
-4 & 0.25 & 2.40 & -0.205 & 2340 & 1573\\
+1 & 1.20 & -0.25  &-0.205 & 1293 & 1852 \\
+2 & 1.20 &  0.25 &  -0.205 & 2692 & 1866 \\
+3 & 2.40 & -0.25 & -0.205 & 1642 & 1563 \\
+4 & 2.40 & 0.25 & -0.205 & 2340 & 1573\\
 \hline
 \end{tabular}
 \end{center}
@@ -198,7 +200,7 @@ We now solve the 5 system parameters with 6 equations: Equations \ref{u} and \re
 \hline
 Parameter & $\alpha$ [rads] & $\beta$ [rads] & $\gamma$ [rads] & $\frac{\lambda}{L_1}$ & $\frac{\lambda}{L_2}$\\
 \hline
-Value & 0.071 & 0.005 & 0.007 & 0.835 & 1.146 \\
+Value & -0.005 & -0.071 & -0.007 & 0.835 & 1.150 \\
 \hline
 \end{tabular}
 \caption{Parameter values}
@@ -223,11 +225,11 @@ Any arbitrary section of the table can be found in the same way if the $x$,$y$ a
     \centering
     \subfloat[ $x \in {[1.2,2.4]}$, $y \in {[-0.25,0.25]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table2.png}}}%
     \qquad
-    \subfloat[ $y \in {[0,1.2]}$, $x \in {[-0.25,-0.05]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table3.png} }}%
+    \subfloat[ $x \in {[0,1.2]}$, $y \in {[-0.25,-0.05]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table3.png} }}%
 	\\
-    \subfloat[ $y \in {[0.6,1.2]}$, $x \in {[0,0.25]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table4.png} }}%
+    \subfloat[ $x \in {[0.6,1.2]}$, $y \in {[0,0.25]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table4.png} }}%
     \qquad
-    \subfloat[ $y \in {[1.2,2.4]}$, $x \in {[-0.15,0.15]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table5.png} }}%
+    \subfloat[ $x \in {[1.2,2.4]}$, $y \in {[-0.15,0.15]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table5.png} }}%
     \caption{Pixels correpsonding to various sections of the Table}%
     \label{fig:multi_table}%
 \end{figure}
@@ -237,8 +239,11 @@ Any arbitrary section of the table can be found in the same way if the $x$,$y$ a
 
 We now consider the effect on the pixels a change in each of the 5 parameters makes, this allows us to better understand how errors in the parameter calculations effect the accuracy of Equations \ref{u} and \ref{v}.
 
-\subsection{Pan Angle}
-Firstly we consider changes to the pan angle, $\gamma$. Suppose the pan angle undergoes a change $\delta\gamma$ such that $\gamma \rightarrow \gamma + \delta\gamma$. By the double angle formulas, $\sin\gamma\rightarrow\sin\gamma\cos\delta\gamma + \cos\gamma\sin\delta\gamma$ and $\cos\gamma\rightarrow\cos\gamma\cos\delta\gamma - \sin\gamma\sin\delta\gamma$. We can then find the change the full rotation matrix.
+\subsection{Extrinsic Parameters}
+Firstly we consider the extrinsic parameters; the three rotation angles.
+
+\subsubsection{Pan Angle}
+Firstly we consider changes to the pan angle, $\gamma$. Suppose the pan angle undergoes a change $\delta\gamma$ such that $\gamma \rightarrow \gamma + \delta\gamma$. By the double angle formulas, $\sin\gamma\rightarrow\sin\gamma\cos\delta\gamma + \cos\gamma\sin\delta\gamma$ and $\cos\gamma\rightarrow\cos\gamma\cos\delta\gamma - \sin\gamma\sin\delta\gamma$. The change to the full rotation matrix is
 
 \begin{equation}
  \mtx{R} + \delta\mtx{R} =
@@ -248,7 +253,7 @@ Firstly we consider changes to the pan angle, $\gamma$. Suppose the pan angle un
     \mtx{R}_{21}\cos\delta\gamma + \mtx{R}_{11}\sin\delta\gamma & \mtx{R}_{22}\cos\delta\gamma + \mtx{R}_{12}\sin\delta\gamma & \mtx{R}_{23}\cos\delta\gamma + \mtx{R}_{13}\sin\delta\gamma \\
 
     \mtx{R}_{31} & \mtx{R}_{32} & \mtx{R}_{33}
- \end{bmatrix}
+ \end{bmatrix}.
 \end{equation}
 
 Recall Equation \ref{u} that describes the pixel $u$ as a function of $(x,y,z)$ parameterised by $\alpha$, $\beta$, $\gamma$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$, we can find the change $u + \delta u$ by substituting $\mtx{R} + \delta\mtx{R}$ for $\mtx{R}$ in to the equation as shown in Equation \ref{dugamma} below.
@@ -261,16 +266,16 @@ Recall Equation \ref{u} that describes the pixel $u$ as a function of $(x,y,z)$ 
         \bigg]
 \end{equation}
 
-As the angle change tends to zero, then Equation \ref{dugamma} tends to the original pixel equation. Therefore: $\lim_{\delta\gamma \to 0} u + \delta u = u$. Identically for pixel $v$:
+Identically for pixel $v$:
 
 \begin{equation}\label{dvgamma}
     v + \delta v = n\frac{\lambda}{L_2}
-        \bigg[\frac{\mtx{R}_{31}x + \mtx{R}_{22}y + \mtx{R}_{23}z}
+        \bigg[\frac{\mtx{R}_{31}x + \mtx{R}_{32}y + \mtx{R}_{33}z}
                    {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
         \bigg]
 \end{equation}
 
-\subsection{Tilt Angle}
+\subsubsection{Tilt Angle}
 
 We can perform the same analysis on the changes to the tilt angle $\beta$. We find the following changes to the pixels with a change in tilt angle:
 
@@ -293,17 +298,17 @@ We can perform the same analysis on the changes to the tilt angle $\beta$. We fi
 
 where
 $$
-\epsilon_1 = -(\cos\gamma\sin\beta)x + (\cos\gamma\cos\beta\sin\alpha) y + (\cos\cos\beta\cos\alpha) z,
+\epsilon_1 = -(\cos\gamma\sin\beta)x + (\cos\gamma\cos\beta\sin\alpha) y + (\cos\gamma\cos\beta\cos\alpha) z,
 $$
 $$
-\epsilon_2 = -(\sin\gamma\sin\beta)x + (\sin\gamma\cos\beta\sin\alpha) y + (\sin\cos\beta\cos\alpha) z
+\epsilon_2 = -(\sin\gamma\sin\beta)x + (\sin\gamma\cos\beta\sin\alpha) y + (\sin\gamma\cos\beta\cos\alpha) z
 $$
 and
 $$
-\epsilon_2 = (\cos\beta)x - (\sin\beta\sin\alpha) y - (\sin\beta\cos\alpha) z.
+\epsilon_3 = (\cos\beta)x - (\sin\beta\sin\alpha) y - (\sin\beta\cos\alpha) z.
 $$
 
-\subsection{Roll Angle}
+\subsubsection{Roll Angle}
 
 Finally the the pixel changes for a change in roll angle $\alpha$ is given below.
 
@@ -325,6 +330,87 @@ Finally the the pixel changes for a change in roll angle $\alpha$ is given below
         \bigg]
 \end{equation}
 
+In each case as the angle change tends to zero, the equations tend back to the original pixel equations. This is expected and gives us confidence in the sensitivity analysis.
+The sensitivity equations are functions of the coordinates $(x,y,z)$ and the parameters $\alpha$, $\beta$, $\gamma$, $L_1$ and $L_2$. Let us consider how the pixels are affected then in the table scenario where these are known. Figure \ref{fig:sensitivity} shows how the pixels of corner1 change with to the roll, tilt and pan angles. When $\delta\alpha=\delta\beta=\delta\gamma=0$ the corner pixels are $(u,v) =(-724,-340)$ and the parameters are the values in Table \ref{table:results}. We then find the pixels $(u + \delta u,v + \delta v)$ as $\alpha \rightarrow \alpha + \delta\alpha$ , $\beta \rightarrow \beta + \delta\beta$ and $\gamma \rightarrow \gamma + \delta\gamma$. We only consider each angle change independently, $\delta\beta$ and $\delta\gamma$ are varied between $-\frac{\pi}{12}$ and  $\frac{\pi}{12}$ and $\delta\alpha$ is varied between $-\frac{\pi}{4}$ and  $\frac{\pi}{4}$.
+
+\begin{figure}
+\centering
+\includegraphics[]{images/sensitivity_cropped.pdf}
+\caption{$(u + \delta u,v + \delta v)$ as $\alpha \rightarrow \alpha + \delta\alpha$ , $\beta \rightarrow \beta + \delta\beta$ and $\gamma \rightarrow \gamma + \delta\gamma$}\label{fig:sensitivity}
+\end{figure}
+
+%---------------SLAM---------------------%
+
+\section{A Sort of SLAM}
+
+A more realistic scenario is that we collect information about coordinates and their pixels on the image sequentially. In this case we want to solve our model parameters with each update, at any time the system could be under-determined or over-determined and in the latter case it is likely to be inconsistent due to error. Therefore solving the parameters analytically is not suitable. \\
+
+Instead we solve a least squares problem; we find the set of parameters $\theta$ that minimises $S = \sum_{i=1}^n \sqrt{(u_i - u(x_i,y_i,z_i;\theta))^2 + (v_i - v(x_i,y_i,z_i;\theta))^2}$. As we collect more coordinates and pixels and $n$ grows larger we hope to converge towards the true solution. The functions $u(x,y,z;\theta)$ and $v(x,y,z;\theta)$ are nonlinear and so the Levenberg Marquardt (LM) algorithm is used to minimise $S$.
+
+\subsection{Finding the road}
+
+We will validate this method by trying to find the road surface in an image. Firstly a data set of coordinates and pixels is collected about the two arrow heads shown in Figure \ref{fig:arrows}. Relative position of the car, we find the coordinates and pixels of the arrow heads for multiple images shown in Table \ref{table:arrows}. We then iteratively minimise the $S$ as we increase $n$; perform least squares with more and more data points. For each $\theta$ found we can try to find the road surface, which is known to be a surface with coordinates  $x \in {0:28]}$, $y \in {[-2.34,1.92]}$, $z=-2.5$. Figure \ref{fig:multi_road} shows the found road surface for increasing $n$. It is clear that as least squares is performed with more coordinates and pixels, the road surface is found more accurately. The LM algorithm is implemented via \texttt{lsqnonlin} in Matlab.\\
+
+TO DO
+\begin{itemize}
+\item discuss limitations of LM - had to give an initial guess
+\item other ideas - bayes update? hard to create a likelihood function.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \subfloat[$n =1$ ]{{\includegraphics[width=7.5cm]{images/road1.png}}}%
+    \qquad
+    \subfloat[$n =4$ ]{{\includegraphics[width=7.5cm]{images/road4.png} }}%
+	\\
+    \subfloat[$n =7$ ]{{\includegraphics[width=7.5cm]{images/road7.png} }}%
+    \qquad
+    \subfloat[$n =10$ ]{{\includegraphics[width=7.5cm]{images/road10.png} }}%
+	\\
+    \subfloat[$n =13$ ]{{\includegraphics[width=7.5cm]{images/road13.png} }}%
+    \qquad
+    \subfloat[$n =16$ ]{{\includegraphics[width=7.5cm]{images/road16.png} }}%
+    \caption{The road surface found with increasing $n$ coordinate and pixels.}%
+    \label{fig:multi_road}%
+\end{figure}
+
+\begin{table}[t]
+    \begin{minipage}[]{.5\textwidth }
+        \footnotesize
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+x[m]        & y[m]        & z[m]  & u    & v    \\
+\hline
+51.87242 & 3.605309 & -3 & 1438 & 926  \\
+45.61886 & 1.190803 & -3 & 1339 & 941  \\
+47.87812 & 3.600823 & -3 & 1453 & 929  \\
+41.62455 & 1.186317 & -3 & 1348 & 944  \\
+43.89484 & 3.605187 & -3 & 1471 & 938  \\
+37.64128 & 1.190681 & -3 & 1354 & 956  \\
+39.91637 & 3.791514 & -3 & 1486 & 953  \\
+33.6734  & 1.349745 & -3 & 1360 & 971  \\
+35.92422 & 3.789489 & -3 & 1510 & 965  \\
+29.68125 & 1.34772  & -3 & 1372 & 995  \\
+31.92212 & 3.788512 & -3 & 1543 & 980  \\
+25.67915 & 1.346743 & -3 & 1387 & 1022 \\
+27.92997 & 3.786488 & -3 & 1582 & 1013 \\
+21.68699 & 1.344719 & -3 & 1405 & 1070 \\
+23.93952 & 3.79023  & -3 & 1633 & 1046 \\
+17.69612 & 1.349551 & -3 & 1432 & 1127 \\
+19.95731 & 3.787854 & -3 & 1705 & 1094 \\
+13.71391 & 1.347174 & -3 & 1477 & 1226 \\
+15.95521 & 3.787575 & -3 & 1819 & 1160 \\
+9.711814 & 1.346895 & -3 & 1573 & 1421 \\
+\hline
+\end{tabular}
+\caption{Arrowhead coordinates and pixels.}\label{table:arrows}
+    \end{minipage}%
+    \begin{minipage}[]{.5\textwidth}
+        \includegraphics[width = \textwidth]{images/2_2369_8551_editted.jpg}
+        \captionof{figure}{Two arrowheads used for coordinate and pixel data collection.}
+        \label{fig:arrows}
+    \end{minipage}
+\end{table}
 
 \begin{thebibliography}{9}
 \bibitem{rotations}
