@@ -1,7 +1,7 @@
-function F = cameraEquationsSLAM(params,u,v,x,y,z)
+function F = cameraEquationsSLAM(params,u,v,x,y)
 
 A = params(1); B = params(2); G = params(3); L1 = params(4); L2 = params(5);
-%z = -params(6);
+z = -params(6);
 
 % defining full rotation matrix
 R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*sin(B)*cos(A);
