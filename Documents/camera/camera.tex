@@ -1,0 +1,421 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx,fullpage}
+\usepackage{amsmath}
+\usepackage{subfig}
+\usepackage[section]{placeins}
+\usepackage{epstopdf, color}
+
+
+\newcommand{\mtx}[1]{\ensuremath{\mathbf{#1}}}
+
+\title{From The World to Pixels on a Digital Image}
+\date{\today}
+\author{Tom Strain}
+
+\begin{document}
+\maketitle
+
+% ---------------------------------------------------------------------
+% ---------------------------Introduction---------------------------
+% ---------------------------------------------------------------------
+
+\section{Introduction}
+This report describes a novel method for transforming a coordinate in three-dimensional space $(x,y,z)$ into pixels $ (u,v)$ in a digital image taken by a camera. Equations that express $u$ and $v$ as a function of $(x,y,z)$ parameterised by the camera's intrinsic and extrinsic parameters $\alpha$, $\beta$, $\gamma$, $L_1$ and $L_2$ are derived from first principles, from these the vanishing point special case is found. It is shown that the parameters can be solved with knowledge of two sets of coordinates and corresponding pixels, and the vanishing point. This methodology is validated via an experiment in which a photograph of a table is taken at a known position and the camera parameters are consequently solved.
+
+% ---------------------------------------------------------------------
+% ------------------------------Method------------------------------
+% ---------------------------------------------------------------------
+
+\section{Method}
+
+% ------------------------------Coordinate Transformation------------------------------
+
+\subsection{Coordinate Transformation} 
+Let us define the camera coordinate system $ (e_1,e_2,e_3)$. The camera is located at $\textbf{c} = (x_c,y_c,z_c)$ and is assumed to be known as shown in Figure \ref{fig:axis}. The coordinate $\textbf{p} = (x_p,y_p,z_p)$ is transformed into the camera coordinate system by translating such that $\textbf{c}$ is at the origin and rotating through the roll $(\alpha)$, tilt $(\beta)$ and pan $(\gamma)$ angles of the camera, around the $x$,$y$ and $z$ axes respectively. The rotations are the non-commutative SO(3) Rotation Group Matrices \cite{rotations}, therefore:
+
+\begin{align}
+\textbf{p}_c & = 
+\begin{bmatrix}
+    \cos\gamma & -\sin\gamma & 0 \\
+    \sin\gamma & \cos\gamma & 0 \\
+       0 & 0 & 1
+\end{bmatrix}
+\begin{bmatrix}
+    \cos\beta & 0 & \sin\beta \\
+    0 & 1 & 0 \\
+   -\sin\beta & 0 & \cos\beta
+\end{bmatrix}
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & \cos\alpha & -\sin\alpha \\
+    0 & \sin\alpha &  \cos\alpha
+\end{bmatrix}
+(\textbf{p}-\textbf{c})
+\\ & =
+\mtx{R} (\textbf{p}-\textbf{c})
+\end{align}
+where
+\begin{equation}
+\mtx{R} =
+\begin{bmatrix}
+\cos\gamma\cos\beta & -\sin\gamma\cos\alpha + \cos\gamma\sin\beta\sin\alpha & \sin\gamma\sin\alpha + \cos\gamma\sin\beta\cos\alpha \\
+\sin\gamma\cos\beta & \cos\gamma\cos\alpha + \sin\gamma\sin\beta\sin\alpha & -\cos\gamma\sin\alpha + \sin\gamma\sin\beta\cos\alpha \\
+-\sin\beta & \cos\beta\sin\alpha & \cos\beta\cos\alpha
+\end{bmatrix}.
+\end{equation}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.7\linewidth]{images/axis.pdf}
+\caption{The world and camera coordinate systems, the camera origin $c$, and coordinate $p$.}\label{fig:axis}
+\end{figure}
+
+In the case where $c = (0,0,0)$ and $\alpha = \beta = \gamma = 0$, then  $(x,y,z) = (e_1,e_2,e_3)$  and  $\textbf{p} = \textbf{p}_c$. The rest of the report considers transforming $\textbf{p}_c$ into pixels $(u,v)$ on a digital image taken by the camera.
+
+% ------------------------------Collapsing onto Planes------------------------------
+
+\subsection{Collapsing onto Planes}
+
+The image taken by the camera is orthogonal to $e_1$, also known as the optical axis. The position of $\textbf{p}_c$ in the $(e_2,e_3)$ plane are its components in the $(e_1,e_2)$ plane $\textbf{p}_{12}$, and in the $(e_1,e_3)$ plane $\textbf{p}_{13}$ where,
+
+$$\textbf{p}_{12} =\textbf{p}_c - (\textbf{p}_c \cdot e_3)e_3$$
+and
+$$\textbf{p}_{13} =\textbf{p}_c - (\textbf{p}_c \cdot e_2)e_2.$$
+
+
+The vectors $\textbf{p}_{13}$ and $\textbf{p}_{23}$ make angles $\psi$ and $\phi$ with $e_1$ respectively.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\linewidth]{images/planes.pdf}
+\caption{The components of $\textbf{p}_c$ in the $(e_1,e_2)$ and $(e_1,e_3)$ planes.}\label{fig:planes}
+\end{figure}
+
+% ------------------------------Onto the Image Plane------------------------------
+
+\subsection{Onto the Image Plane}\label{ontotheplane}
+
+The camera is assumed to be a pinhole camera \cite{pinholeModel}. The origin of the camera coordinate system $c$ is at the lens and the focal length $\lambda$ is the distance from the lens to the image plane which has size $L_1 \times L_2$. Consider the camera in the $(e_1,e_3)$ plane shown in Figure \ref{fig:pinhole}, the vector $\textbf{p}_c$ is projected to height $h$ on the image plane. Via trigonometry $h = \lambda\tan\psi$, identically the projection of $\textbf{p}_c$ to width $w$ on the image plane in the $(e_1,e_2)$ plane is $w = \lambda\tan\phi$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.58\linewidth]{images/pinhole.pdf}
+\caption{Projection of $\textbf{P}_c$ to $h$ on the image plane through a pinhole camera in the $(e_1,e_3)$ plane. The image plane has size $L_1\times L_2$ and the camera has focal length $\lambda$.}\label{fig:pinhole}
+\end{figure}
+
+% ------------------------------From the Image Plane to Pixels------------------------------
+
+\subsection{From the Image Plane to Pixels}
+
+Assuming perfectly square identical pixels throughout the digital image, we now describe the transformation from width and height $(w,h)$ on the image plane to pixels $(u,v)$ on a digital image of size $m\times n$. There are $m$ pixels equally spaced along length $L_1$ and $n$ pixels along $L_2$ therefore,
+
+$$
+u = \frac{m}{L_1}w = m\frac{\lambda}{L_1}\tan\phi
+ = m\frac{\lambda}{L_1} 
+\bigg[ \frac{\textbf{p}_{12}\cdot e_2}{\textbf{p}_{12}\cdot e_1}\bigg]
+$$
+and
+$$
+v = \frac{n}{L_2}h=n\frac{\lambda}{L_2}{\tan\psi}
+ = n\frac{\lambda}{L_2}
+\bigg[\frac{\textbf{p}_{13}\cdot e_3}{\textbf{p}_{13}\cdot e_1}\bigg].
+$$
+
+Expressing these in terms of the pitch, pan and tilt angles in matrix $\mtx{R}$ and world coordinates $(x,y,z)$ gives the following equations that describe the pixels as a function of a coordinate in the world $(u(x,y,z),v(x,y,z))$ parameterised by the extrinsic camera parameters $\alpha, \beta$ and $\gamma$, and the intrinsic camera parameters $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+
+\begin{equation}\label{u}
+u(x,y,z;\theta) = m\frac{\lambda}{L_1}
+\bigg[ \frac{\mtx{R}_{21}x+ \mtx{R}_{22}y + \mtx{R}_{23}z}
+{\mtx{R}_{11}x+ \mtx{R}_{12}y + \mtx{R}_{13}z} \bigg]
+\end{equation}
+
+\begin{equation}\label{v}
+v(x,y,z;\theta)= n\frac{\lambda}{L_2}
+\bigg[ \frac{\mtx{R}_{31}x+ \mtx{R}_{32}y + \mtx{R}_{33}z}
+{\mtx{R}_{11}x+ \mtx{R}_{12}y + \mtx{R}_{13}z} \bigg]
+\end{equation}
+
+Where $\theta=[\alpha,\beta,\gamma,\frac{\lambda}{L_1},\frac{\lambda}{L_2}]$.
+
+% ------------------------------Vanishing Points------------------------------
+
+\subsubsection{Vanishing Points}
+
+The vanishing point in a digital image are the pixels at which all parallel lines orthogonal to the  $(e_2,e_3)$ plane converge and can be found by inspection of the image. Let us denote this pixel pair as $(u_p, v_p)$, it follows then that:
+
+\begin{equation}\label{up}
+u_p = \lim_{x\to\infty} u(x,y,z;\theta) = m\frac{\lambda}{L_1}
+\bigg[\frac{\mtx{R}_{21}}
+{\mtx{R}_{11}} \bigg]
+\end{equation}
+
+\begin{equation}\label{vp}
+v_p = \lim_{x\to\infty} v(x,y,z;\theta) = n\frac{\lambda}{L_2}
+\bigg[\frac{\mtx{R}_{31}}
+{\mtx{R}_{11}} \bigg]
+\end{equation}
+
+Equations \ref{u},\ref{v},\ref{up} and \ref{vp} form a set of 4 equations to be solved for 5 parameters, and therefore represent an under-determined system. Consequently 2 corresponding pairs of world coordinates and pixels are required thus forming 6 equations to over-determine the system and solve for $\gamma$, $\beta$, $\alpha$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$.
+
+% --------------------------------------------------------------------------
+% ------------------------------Experiment-------------------------------
+% --------------------------------------------------------------------------
+
+\section{Experiment}
+
+An experiment was undertaken to validate the methods described in this report, an iPhone 6 camera was placed on a stand at a height of 0.205m at the end of two joined tables each 50cm in width and 120cm in length.\\
+
+The corners where the two tables meet, and the corners at the end of the second table are reliable world coordinates. The experiment setup and four coordinates are shown in Figure \ref{fig:experiment}. Taking the end where the camera was placed, half way across the table, and the table height as the origin of the world coordinate origin, the corresponding coordinates and pixels of the table corners are shown in Table \ref{table:1}. By inspection, the vanishing point is found to be $(10,221)$. 
+\newline
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{images/table_data.png}
+\caption{Experiment setup}\label{fig:experiment}
+\end{figure}
+
+\begin{table}[!htb]
+\begin{center}
+\begin{tabular}{ |c|c|c|c|c|c| } 
+\hline
+Corner & $x$[m] & $y$[m] & $z$[m] &$u$ & $v$\\
+\hline
+1 & 1.20 & -0.25  &-0.205 & 1293 & 1852 \\
+2 & 1.20 &  0.25 &  -0.205 & 2692 & 1866 \\
+3 & 2.40 & -0.25 & -0.205 & 1642 & 1563 \\
+4 & 2.40 & 0.25 & -0.205 & 2340 & 1573\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Table corner coordinates and pixels}
+\label{table:1}
+\end{table}
+
+We now solve the 5 system parameters with 6 equations: Equations \ref{u} and \ref{v} for the world coordinates and pixels of corners 1 and 4, and Equations \ref{up} and \ref{vp} for the vanishing point. The \texttt{fsolve} numerical equation solver in Matlab is used to solve the parameters values shown in Table \ref{table:results}.
+
+
+\begin{table}[!htb]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Parameter & $\alpha$ [rads] & $\beta$ [rads] & $\gamma$ [rads] & $\frac{\lambda}{L_1}$ & $\frac{\lambda}{L_2}$\\
+\hline
+Value & -0.005 & -0.071 & -0.007 & 0.835 & 1.150 \\
+\hline
+\end{tabular}
+\caption{Parameter values}
+\label{table:results}
+\end{table}
+
+% ------------------------------Validation-------------------------------
+
+\subsection{Validation}
+We can validate the results by finding pixels for a set of world coordinates that are known. Consider the table that the camera is fixed to, it is a continuous set of coordinates $(x,y,z)$ where $x \in \left[0,2.4\right]$,  $y \in \left[-2.5,2.5\right]$, and $z=-0.21$.  The corresponding set of pixels for the table coordinates are then found using Equations \ref{u} and \ref{v} with the parameters values in Table \ref{table:results}. The table pixels are shown in Figure \ref{fig:result}. \\
+
+Any arbitrary section of the table can be found in the same way if the $x$,$y$ and $z$ coordinates are known, four sections of the table and corresponding pixels are shown in Figure \ref{fig:multi_table}.
+
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=10cm]{images/found_table.png}
+\caption{A grid of pixels corresponding to every 10cm across and down the tables}\label{fig:result}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \subfloat[ $x \in {[1.2,2.4]}$, $y \in {[-0.25,0.25]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table2.png}}}%
+    \qquad
+    \subfloat[ $x \in {[0,1.2]}$, $y \in {[-0.25,-0.05]}$, $z=-0.205$ ]{{\includegraphics[width=6cm]{images/table3.png} }}%
+	\\
+    \subfloat[ $x \in {[0.6,1.2]}$, $y \in {[0,0.25]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table4.png} }}%
+    \qquad
+    \subfloat[ $x \in {[1.2,2.4]}$, $y \in {[-0.15,0.15]}$, $z=-0.205$]{{\includegraphics[width=6cm]{images/table5.png} }}%
+    \caption{Pixels correpsonding to various sections of the Table}%
+    \label{fig:multi_table}%
+\end{figure}
+
+% ------------------------------Sensitivity Analysis-------------------------------
+\section{Sensitivity Analysis}
+
+We now consider the effect on the pixels a change in each of the 5 parameters makes, this allows us to better understand how errors in the parameter calculations effect the accuracy of Equations \ref{u} and \ref{v}.
+
+\subsection{Extrinsic Parameters}
+Firstly we consider the extrinsic parameters; the three rotation angles.
+
+\subsubsection{Pan Angle}
+Firstly we consider changes to the pan angle, $\gamma$. Suppose the pan angle undergoes a change $\delta\gamma$ such that $\gamma \rightarrow \gamma + \delta\gamma$. By the double angle formulas, $\sin\gamma\rightarrow\sin\gamma\cos\delta\gamma + \cos\gamma\sin\delta\gamma$ and $\cos\gamma\rightarrow\cos\gamma\cos\delta\gamma - \sin\gamma\sin\delta\gamma$. The change to the full rotation matrix is
+
+\begin{equation}
+ \mtx{R} + \delta\mtx{R} =
+  \begin{bmatrix}
+    \mtx{R}_{11}\cos\delta\gamma - \mtx{R}_{21}\sin\delta\gamma & \mtx{R}_{12}\cos\delta\gamma - \mtx{R}_{22}\sin\delta\gamma & \mtx{R}_{13}\cos\delta\gamma - \mtx{R}_{23}\sin\delta\gamma \\
+
+    \mtx{R}_{21}\cos\delta\gamma + \mtx{R}_{11}\sin\delta\gamma & \mtx{R}_{22}\cos\delta\gamma + \mtx{R}_{12}\sin\delta\gamma & \mtx{R}_{23}\cos\delta\gamma + \mtx{R}_{13}\sin\delta\gamma \\
+
+    \mtx{R}_{31} & \mtx{R}_{32} & \mtx{R}_{33}
+ \end{bmatrix}.
+\end{equation}
+
+Recall Equations \ref{u} and \ref{v} that describe the pixels $u$ and $v$ as a function of coordinates $(x,y,z)$ parameterised by $\alpha$, $\beta$, $\gamma$, $\frac{\lambda}{L_1}$ and $\frac{\lambda}{L_2}$, we can find the changes $u + \delta u$ and $v + \delta v$ by substituting $\mtx{R} + \delta\mtx{R}$ for $\mtx{R}$ in to the equations as shown below.
+
+\begin{equation}\label{dugamma}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\gamma 
+                  + (\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\sin\delta\gamma}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
+        \bigg]
+\end{equation}
+
+\begin{equation}\label{dvgamma}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{\mtx{R}_{31}x + \mtx{R}_{32}y + \mtx{R}_{33}z}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\gamma -(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\sin\delta\gamma}                  
+        \bigg]
+\end{equation}
+
+\subsubsection{Tilt Angle}
+
+We now perform the same analysis on the tilt angle $\beta$ and find the following pixels changes:
+
+\begin{equation}\label{dubeta}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{(\mtx{R}_{21}x + \mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\beta 
+                  + \epsilon_2\sin\delta\beta}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\beta
+                  + \epsilon_1\sin\delta\beta}                  
+        \bigg]
+\end{equation}
+\begin{equation}\label{dvbeta}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{(\mtx{R}_{31}x + \mtx{R}_{32}y + \mtx{R}_{33}z)\cos\delta\beta 
+                  + \epsilon_3\sin\delta\beta}
+                   {(\mtx{R}_{11}x + \mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\beta
+                  + \epsilon_1\sin\delta\beta}                  
+        \bigg]
+\end{equation}
+
+where
+$$
+\epsilon_1 = -(\cos\gamma\sin\beta)x + (\cos\gamma\cos\beta\sin\alpha) y + (\cos\gamma\cos\beta\cos\alpha) z,
+$$
+$$
+\epsilon_2 = -(\sin\gamma\sin\beta)x + (\sin\gamma\cos\beta\sin\alpha) y + (\sin\gamma\cos\beta\cos\alpha) z
+$$
+and
+$$
+\epsilon_3 = (\cos\beta)x - (\sin\beta\sin\alpha) y - (\sin\beta\cos\alpha) z.
+$$
+
+\subsubsection{Roll Angle}
+
+Finally the the pixel changes for a change in roll angle $\alpha$ is given below.
+
+\begin{equation}\label{dualpha}
+    u + \delta u = m\frac{\lambda}{L_1}
+        \bigg[\frac{\mtx{R}_{21}x + (\mtx{R}_{22}y + \mtx{R}_{23}z)\cos\delta\alpha 
+                   +(\mtx{R}_{23}y - \mtx{R}_{22}z)\sin\delta\alpha}
+                   {\mtx{R}_{11}x + (\mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\alpha 
+                   +(\mtx{R}_{13}y - \mtx{R}_{12}z)\sin\delta\alpha}                  
+        \bigg]
+\end{equation}
+
+\begin{equation}\label{dvalpha}
+    v + \delta v = n\frac{\lambda}{L_2}
+        \bigg[\frac{\mtx{R}_{31}x + (\mtx{R}_{32}y + \mtx{R}_{33}z)\cos\delta\alpha 
+                   +(\mtx{R}_{33}y - \mtx{R}_{32}z)\sin\delta\alpha}
+                   {\mtx{R}_{11}x + (\mtx{R}_{12}y + \mtx{R}_{13}z)\cos\delta\alpha 
+                   +(\mtx{R}_{13}y - \mtx{R}_{12}z)\sin\delta\alpha}                  
+        \bigg]
+\end{equation}
+
+In each case as the angle change tends to zero, the equations tend back to the original pixel equations. This is expected and gives us confidence in the sensitivity analysis.\\
+\newline
+The sensitivity equations are functions of the coordinates $(x,y,z)$ and the parameters $\alpha$, $\beta$, $\gamma$, $L_1$ and $L_2$. Let us consider how the pixels are affected then in the table scenario where these are known. Figure \ref{fig:sensitivity} shows how the pixels of corner 1 change with changes to the roll, tilt and pan angles. When $\delta\alpha=\delta\beta=\delta\gamma=0$ the corner pixels are $(u,v) =(-724,-340)$ and the parameters are the values in Table \ref{table:results}. We then find the pixels $(u + \delta u,v + \delta v)$ as $\alpha \rightarrow \alpha + \delta\alpha$ , $\beta \rightarrow \beta + \delta\beta$ and $\gamma \rightarrow \gamma + \delta\gamma$. We only consider each angle change independently, $\delta\beta$ and $\delta\gamma$ are varied between $-\frac{\pi}{12}$ and  $\frac{\pi}{12}$ and $\delta\alpha$ is varied between $-\frac{\pi}{4}$ and  $\frac{\pi}{4}$.
+
+\begin{figure}
+\centering
+\includegraphics[]{images/sensitivity_cropped.pdf}
+\caption{$(u + \delta u,v + \delta v)$ as $\alpha \rightarrow \alpha + \delta\alpha$ , $\beta \rightarrow \beta + \delta\beta$ and $\gamma \rightarrow \gamma + \delta\gamma$}\label{fig:sensitivity}
+\end{figure}
+
+%%---------------SLAM---------------------%
+%
+%\section{A Sort of SLAM}
+%
+%A more realistic scenario is that we collect information about coordinates and their pixels on the image sequentially. In this case we want to solve our model parameters with each update, at any time the system could be under-determined or over-determined and in the latter case it is likely to be inconsistent due to error. Therefore solving the parameters analytically is not suitable. \\
+%
+%Instead a least squares regression is solved to find the set of parameters $\theta$ that minimises $S = \sum_{i=1}^n \sqrt{(u_i - u(x_i,y_i,z_i;\theta))^2 + (v_i - v(x_i,y_i,z_i;\theta))^2}$. As we collect more coordinates and pixels and $n$ grows larger we hope to converge towards the true solution. The functions $u(x,y,z;\theta)$ and $v(x,y,z;\theta)$ are nonlinear and so the Levenberg Marquardt (LM) algorithm is used to minimise $S$.
+%
+%\subsection{Finding the road}
+%
+%We will validate this method by trying to find the road surface in an image. Firstly a data set of coordinates and pixels is collected about the two arrow heads shown in Figure \ref{fig:arrows}. Relative position of the car, we find the coordinates and pixels of the arrow heads for multiple images shown in Table \ref{table:arrows}. We then iteratively minimise the $S$ as we increase $n$; perform least squares with more and more data points. For each $\theta$ found we can try to find the road surface, which is known to be a surface with coordinates  $x \in {[0:28]}$, $y \in {[-2.34,1.92]}$, $z=-2.5$. Figure \ref{fig:multi_road} shows the found road surface for increasing $n$. It is clear that as least squares is performed with more coordinates and pixels, the road surface is found more accurately. The LM algorithm is implemented via \texttt{lsqnonlin} in Matlab.\\
+%
+%TO DO
+%\begin{itemize}
+%\item discuss limitations of LM - had to give an initial guess
+%\item other ideas - bayes update? hard to create a likelihood function.
+%\end{itemize}
+%
+%\begin{figure}[h]
+%    \centering
+%    \subfloat[$n =1$ ]{{\includegraphics[width=7.5cm]{images/road1.png}}}%
+%    \qquad
+%    \subfloat[$n =4$ ]{{\includegraphics[width=7.5cm]{images/road4.png} }}%
+%	\\
+%    \subfloat[$n =7$ ]{{\includegraphics[width=7.5cm]{images/road7.png} }}%
+%    \qquad
+%    \subfloat[$n =10$ ]{{\includegraphics[width=7.5cm]{images/road10.png} }}%
+%	\\
+%    \subfloat[$n =13$ ]{{\includegraphics[width=7.5cm]{images/road13.png} }}%
+%    \qquad
+%    \subfloat[$n =16$ ]{{\includegraphics[width=7.5cm]{images/road16.png} }}%
+%    \caption{The road surface found with increasing $n$ coordinate and pixels.}%
+%    \label{fig:multi_road}%
+%\end{figure}
+%
+%\begin{table}[t]
+%    \begin{minipage}[]{.5\textwidth }
+%        \footnotesize
+%\begin{tabular}{|l|l|l|l|l|}
+%\hline
+%x[m]        & y[m]        & z[m]  & u    & v    \\
+%\hline
+%51.87242 & 3.605309 & -2.5 & 1438 & 926  \\
+%45.61886 & 1.190803 & -2.5 & 1339 & 941  \\
+%47.87812 & 3.600823 & -2.5 & 1453 & 929  \\
+%41.62455 & 1.186317 & -2.5 & 1348 & 944  \\
+%43.89484 & 3.605187 & -2.5 & 1471 & 938  \\
+%37.64128 & 1.190681 & -2.5 & 1354 & 956  \\
+%39.91637 & 3.791514 & 2.53 & 1486 & 953  \\
+%33.6734  & 1.349745 & -2.5 & 1360 & 971  \\
+%35.92422 & 3.789489 & -2.5 & 1510 & 965  \\
+%29.68125 & 1.34772  & -2.5 & 1372 & 995  \\
+%31.92212 & 3.788512 & -2.5 & 1543 & 980  \\
+%25.67915 & 1.346743 & -2.5 & 1387 & 1022 \\
+%27.92997 & 3.786488 & -2.5 & 1582 & 1013 \\
+%21.68699 & 1.344719 & -2.5 & 1405 & 1070 \\
+%23.93952 & 3.79023  & -2.5 & 1633 & 1046 \\
+%17.69612 & 1.349551 & -2.5 & 1432 & 1127 \\
+%19.95731 & 3.787854 & -2.5 & 1705 & 1094 \\
+%13.71391 & 1.347174 & -2.5 & 1477 & 1226 \\
+%15.95521 & 3.787575 & -2.5 & 1819 & 1160 \\
+%9.711814 & 1.346895 & -2.5 & 1573 & 1421 \\
+%\hline
+%\end{tabular}
+%\caption{Arrowhead coordinates and pixels.}\label{table:arrows}
+%    \end{minipage}%
+%    \begin{minipage}[]{.5\textwidth}
+%        \includegraphics[width = \textwidth]{images/2_2369_8551_editted.jpg}
+%        \captionof{figure}{Two arrowheads used for coordinate and pixel data collection.}
+%        \label{fig:arrows}
+%    \end{minipage}
+%\end{table}
+
+\begin{thebibliography}{9}
+\bibitem{rotations}
+Arvo, J., 1992. Fast random rotation matrices. In Graphics Gems III (IBM Version) (pp. 117-120).
+\bibitem{pinholeModel} 
+Bradski, G. and Kaehler, A., 2000. OpenCV. Dr. Dobb’s journal of software tools, 3.
+\end{thebibliography}
+
+\end{document}

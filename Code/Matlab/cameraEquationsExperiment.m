@@ -1,4 +1,4 @@
-function eqns = cameraEquations
+function eqns = cameraEquationsExperiment
 
 m = 4032; cx = 2016; % >
 n = 3024; cy = 1512; % ^

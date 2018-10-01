@@ -11,9 +11,11 @@ stickyNotesData = readtable(fullfile(dataDir(),'Experiment','StickyNotes.csv'));
 
 plotCamera('Location',camera_pos,'Orientation',rotz(Gamma)*rotx(90+Alpha),'Size',0.05)
 
-hold on
+
+% hold on
 
 num_stickyNotes = size(stickyNotesData,1);
+
 for row_ind = 1:num_stickyNotes
    row = stickyNotesData(row_ind,:);
    plot3(row.X,row.Y,0,'ro')
@@ -50,6 +52,7 @@ ylabel('Y[m]')
 zlabel('Z[m]')
 grid on
 axis equal
+>>>>>>> 3a90349507257624830e9c9ea5efb1c2781644e6
 
 figure;
 
