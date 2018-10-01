@@ -20,6 +20,9 @@ lane2shoulder = norm(lane_marker0-shoulder0);
 lane2photo = norm(lane_marker0-photo);
 shoulder2photo = norm(shoulder0-photo);
 
+lane_marker0-photo
+shoulder0-photo
+
 
 disp(strcat(['Distance from camera to street light 1: ',num2str(photo2light1),'m']))
 disp(strcat(['Distance from camera to street light 2: ',num2str(photo2light2),'m']))

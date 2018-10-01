@@ -26,9 +26,9 @@ for image_num = 1:10:num_images
                  image.Heading);
              
     width = 3;
-    height = 3;
+    height = 4;
                   
-    x = Pc(1); Y = Pc(2)-width:0.5:Pc(2)+width; Z = -height:0.5:Pc(3)+height;
+    x = Pc(1); Y = Pc(2)-width:0.5:Pc(2)+width; Z = -2.5:0.5:Pc(3)+height;
     %Y = Pc(2);
     if x > 6
         close
