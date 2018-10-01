@@ -2,7 +2,8 @@ function particleFilter
 
 % system paramters
 number_particles = 20000;
-effective_ratio = 0.5; 
+effective_ratio = 0.5;
+number_random_particles = 500;
 
 close all
 file_dir = fullfile(dataDir(),'A27','Year2','target_data_left_metal_structure.csv');
@@ -14,22 +15,23 @@ particles_kminus1 = createRandomParticles(number_particles);
 weights_kminus1 = ones(number_particles,1)/number_particles;
 
 E = sum(particles_kminus1.*weights_kminus1)
+Var = sum((bsxfun(@minus,particles_kminus1,E).^2).*weights_kminus1);
 % findRoad(E)
 % pause(1)
 close
 
 %displayHists(particles)
-Es = [];
-Vars = [];
+Es = [E];
+Vars = [Var];
 delta_angle = 0.0001;
 sigma_transition = [delta_angle,delta_angle,delta_angle,0,0,0];
 
-for D = 1:num_data_points
+for k = 1:num_data_points
     
     particles_k = mvnrnd(particles_kminus1,sigma_transition);
     
     %% getting new data point and getting distance from each particle
-    data_point = data_points(D,:);
+    data_point = data_points(k,:);
     U = data_point.u;
     V = data_point.v;
     X = data_point.x-2.05;
@@ -61,10 +63,10 @@ for D = 1:num_data_points
         disp('Resampling')
         % resampling
         % creating some random particles (1000)
-        particles_k = resampleParticles(particles_k,weights_k,number_particles);
+        particles_k_resampled = resampleParticles(particles_k,weights_k,number_particles-number_random_particles);
         weights_k = ones(number_particles,1)/number_particles;
-        %particles_k_random = createRandomParticles(500);
-        %particles_k = [particles_resampled_k; particles_k_random];
+        particles_k_random = createRandomParticles(number_random_particles);
+        particles_k = [particles_k_resampled; particles_k_random];
     end
      
           
@@ -78,7 +80,12 @@ for D = 1:num_data_points
     %findRoad(E)
     %displayHists(particles,weights)
     %pause(1)
-    %close
+    ymins = [-pi/4,-pi/4,-pi/4,0,0,0];
+    ymaxs = [pi/4,pi/4,pi/4,3,3,3];
+    %createInfoBoard(Es,Vars,E,U,V,num_data_points,k,ymins,ymaxs)
+    %pause(1)
+    close
+   
     particles_kminus1 = particles_k;
     weights_kminus1 = weights_k;
     
@@ -113,11 +120,11 @@ end
 
 function particles = createRandomParticles(number_particles)
     
-    particles = [randRange(-pi/8,pi/8,number_particles),...
-                 randRange(-pi/8,pi/8,number_particles),...
-                 randRange(-pi/8,pi/8,number_particles),...
-                 randRange(0.5,2,number_particles),...
-                 randRange(0.5,2,number_particles),...
+    particles = [randRange(-pi/4,pi/4,number_particles),...
+                 randRange(-pi/4,pi/4,number_particles),...
+                 randRange(-pi/4,pi/4,number_particles),...
+                 randRange(0.5,3,number_particles),...
+                 randRange(0.5,3,number_particles),...
                  randRange(1,3,number_particles)];
 end
 

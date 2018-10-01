@@ -26,7 +26,7 @@ plot(betas + beta_sigmas,'r--')
 ylabel('$\beta$ [rads]','Interpreter','latex')
 xlabel('$k$','Interpreter','latex')
 leg6 = legend('E$[\beta]$','E$[\beta] \pm$ Var$[\beta]$','location','NorthWest');
-set(leg1,'Interpreter','latex');
+set(leg6,'Interpreter','latex');
 %ylim([-pi/4,pi/4])
 xlim([1,size(Es,1)])
 
