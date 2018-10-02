@@ -19,23 +19,22 @@ particles_kminus1 = createRandomParticles(number_particles);
 weights_kminus1 = ones(number_particles,1)/number_particles;
 
 E = sum(particles_kminus1.*weights_kminus1)
+Var = sum((bsxfun(@minus,particles_kminus1,E).^2).*weights_kminus1);
 % findRoad(E)
 % pause(1)
-close
+% close
 
-%displayHists(particles)
-Es = [];
-Vars = [];
+Es = [E];
+Vars = [Var];
+delta_angle = 0.0001;
 sigma_transition = [delta_angle,delta_angle,delta_angle,0,0,0];
 
-
-for D = 1:num_points_in_pic:num_data_points
+for k = 1:num_points_in_pic:num_data_points
     
     particles_k = mvnrnd(particles_kminus1,sigma_transition);
-    
-    %% getting new data point and getting distance from each particle
-    data_points_pic = data_points(D:D+num_points_in_pic-1,:);
     %image_file = char(data_point.image_file);    
+    data_points_pic = data_points(k:k+num_points_in_pic-1,:);
+    
     % p(z_k|x_k)
     observation_differences = zeros(number_particles,num_points_in_pic);
     for j = 1:num_points_in_pic        
@@ -65,9 +64,10 @@ for D = 1:num_points_in_pic:num_data_points
         % resampling
         % creating some random particles (1000)
         particles_k_resampled = resampleParticles(particles_k,weights_k,number_particles-num_random_particles);
-        weights_k = ones(number_particles,1)/number_particles;
         particles_k_random = createRandomParticles(num_random_particles);
         particles_k = [particles_k_resampled; particles_k_random];
+        
+        weights_k = ones(number_particles,1)/number_particles;
     end
      
           
@@ -79,9 +79,14 @@ for D = 1:num_points_in_pic:num_data_points
     Es = [Es;E];
     Vars = [Vars;Var];
     %findRoad(E)
-    %plotRoadTargetAndGuess(image_file, U, V, u_hat, v_hat)
-    %pause(0.5)
-    %close
+    %displayHists(particles,weights)
+    %pause(1)
+    ymins = [-pi/4,-pi/4,-pi/4,0,0,0];
+    ymaxs = [pi/4,pi/4,pi/4,3,3,3];
+    createInfoBoard(Es,Vars,E,U,V,num_data_points,k,ymins,ymaxs)
+    %pause(1)
+    close
+
     particles_kminus1 = particles_k;
     weights_kminus1 = weights_k;
     

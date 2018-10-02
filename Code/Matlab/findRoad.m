@@ -1,6 +1,6 @@
 function findRoad(X)
 
-close all;
+%close all;
 
 img_file = fullfile(dataDir(),'A27','Year2','Images','2_2367_1174.jpg');
 %img_file = fullfile(dataDir(),'A27','Year2','Images','2_2369_8551.jpg');
