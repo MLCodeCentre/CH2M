@@ -4,7 +4,7 @@ function roadSLAMDataCollection
 % click on the target in the photos, the coordinates of the target relative
 % to the car heading are calculated and pixels collected from the click
 
-target_1 = [467610.656; 104359.158; 0]; %right arrow
+target_1 = [472077.371; 105732.673; 0]; %right arrow
 %target_2 = [472082.638; 105729.771; 0]; %left arrow
 %target_3 = [472080.022; 105730.374; 0]; %lane marker after left arrow. 
 
@@ -13,12 +13,13 @@ nav_data = readtable(fullfile(dataDir(),'A27','Year2','Nav','Nav.csv'));
 
 camera = 2;
 PCDATE = 2367;
-PCTIMES = 3241:3261;
+PCTIMES = 759:780;
 
 h = 0;
 
 num_files = length(PCTIMES);
 data_points = zeros(num_files,5);
+file_names = {};
 
 disp('click on the target for each photo')
 
@@ -51,13 +52,16 @@ for ind = 1:num_files
 %     u3 = ceil(U(3));
 %     v3 = ceil(V(3));
     data_points(ind,:) = [Pc1(2),Pc1(1),Pc1(3),u1,v1];
+    file_names{ind} = full_image_file;
     %data_points(3*ind-2,:) = [Pc1(2),Pc1(1),Pc1(3),u1,v1]
     %data_points(3*ind-1,:) = [Pc2(2),Pc2(1),Pc2(3),u2,v2]
     %data_points(3*ind,:) = [Pc3(2),Pc3(1),Pc3(3),u3,v3]
 end
 
 disp('saving table to target_data.csv')
-file_dir = fullfile(dataDir(),'A27','Year2','target_data_left_metal_structure.csv');
-table = array2table(data_points, 'VariableNames', {'x','y','z','u','v'});
+file_dir = fullfile(dataDir(),'A27','Year2','target_data_one_arrow.csv');
+data_point_table = array2table(data_points, 'VariableNames', {'x','y','z','u','v'});
+file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
+table = [file_name_table, data_point_table];
 writetable(table,file_dir)
 

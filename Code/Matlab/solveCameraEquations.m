@@ -38,5 +38,5 @@ end
 
 
 sol = vpasolve(eqs,[A,B,G,L1,L2,h]);
-params = [sol.A, sol.B, sol.G, sol.L1, sol.L2, sol.h]
+params = [sol.A, sol.B, sol.G, sol.L1, sol.L2, sol.h];
 findRoad(params)

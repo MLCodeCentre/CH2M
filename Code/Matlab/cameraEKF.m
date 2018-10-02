@@ -2,12 +2,12 @@ function cameraEKF
 
 close all
 
-file_dir = fullfile(dataDir(),'A27','Year2','target_data_left_metal_structure.csv');
+file_dir = fullfile(dataDir(),'A27','Year2','target_data_one_arrow.csv');
 data_points = readtable(file_dir);
 num_data_points = size(data_points,1);
 
 mu_tminus1 = [0,0,0,1,1,2]';
-Sigma_tminus1 = 1*eye(6);
+Sigma_tminus1 = 0.0001*eye(6);
 mus = [];
 sigmas = [];
     for D = 1:num_data_points

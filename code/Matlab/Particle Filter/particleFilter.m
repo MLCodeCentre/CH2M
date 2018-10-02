@@ -1,11 +1,16 @@
 function particleFilter
 
-% system paramters
-number_particles = 20000;
-effective_ratio = 0.5; 
+%% system paramters
+number_particles = 10000;
+effective_ratio = 0.5;
+likelihood_sigma = 500;
+num_random_particles = 200;
+delta_angle = 0.0001;
+
+num_points_in_pic = 1;
 
 close all
-file_dir = fullfile(dataDir(),'A27','Year2','target_data_left_metal_structure.csv');
+file_dir = fullfile(dataDir(),'A27','Year2','target_data_one_arrow.csv');
 data_points = readtable(file_dir);
 num_data_points = size(data_points,1);
 
@@ -21,39 +26,37 @@ close
 %displayHists(particles)
 Es = [];
 Vars = [];
-delta_angle = 0.0001;
 sigma_transition = [delta_angle,delta_angle,delta_angle,0,0,0];
 
-for D = 1:num_data_points
+
+for D = 1:num_points_in_pic:num_data_points
     
     particles_k = mvnrnd(particles_kminus1,sigma_transition);
     
     %% getting new data point and getting distance from each particle
-    data_point = data_points(D,:);
-    U = data_point.u;
-    V = data_point.v;
-    X = data_point.x-2.05;
-    Y = data_point.y;
-    Z = 0; 
-    
+    data_points_pic = data_points(D:D+num_points_in_pic-1,:);
+    %image_file = char(data_point.image_file);    
     % p(z_k|x_k)
-    observation_differences = zeros(number_particles,1);
-    for i = 1:number_particles
-        % finding difference in observation and particle
-        particle_ik = particles_k(i,:);
-        [u_hat,v_hat] = cameraEquationFunction(particle_ik,[X,Y,Z]);
-        observation_differences(i) = sqrt((U-u_hat)^2 +  (V-v_hat)^2);
+    observation_differences = zeros(number_particles,num_points_in_pic);
+    for j = 1:num_points_in_pic        
+        U = data_points_pic(j,:).u;
+        V = data_points_pic(j,:).v;
+        X = data_points_pic(j,:).x-2.05;
+        Y = data_points_pic(j,:).y;
+        Z = 0; 
+        for i = 1:number_particles
+            % finding difference in observation and particle
+            particle_ik = particles_k(i,:);
+            [u_hat,v_hat] = cameraEquationFunction(particle_ik,[X,Y,Z]);
+            observation_differences(i,j) = sqrt((U-u_hat)^2 +  (V-v_hat)^2);
+            
+        end
     end
-    P_ZkPk = normpdf(observation_differences,0,200);
-    weights_k = weights_kminus1.*P_ZkPk;
-%     % p(x_k|x^i_k-1)
-%     for i = 1:number_particles
-%         particle_ikminus1 = particles_kminus1(i,:);
-%         PkPkminus1_differences = bsxfun(@minus, particle_ikminus1, particles_k);
-%         P_PkPkminus1 = mvnpdf(PkPkminus1_differences, mu_transition, sigma_transition);
-%         weights_k(i) = weights_kminus1(i)*sum(P_ZkPk.*P_PkPkminus1);
-%     end
     
+    observation_differences = mean(observation_differences,2);
+    
+    P_ZkPk = normpdf(observation_differences,0,likelihood_sigma);
+    weights_k = weights_kminus1.*P_ZkPk;    
     weights_k = weights_k./sum(weights_k);
     % if number of effective particles is below half then resample all.
     Neff = 1/sum(weights_k.^2);
@@ -61,10 +64,10 @@ for D = 1:num_data_points
         disp('Resampling')
         % resampling
         % creating some random particles (1000)
-        particles_k = resampleParticles(particles_k,weights_k,number_particles);
+        particles_k_resampled = resampleParticles(particles_k,weights_k,number_particles-num_random_particles);
         weights_k = ones(number_particles,1)/number_particles;
-        %particles_k_random = createRandomParticles(500);
-        %particles_k = [particles_resampled_k; particles_k_random];
+        particles_k_random = createRandomParticles(num_random_particles);
+        particles_k = [particles_k_resampled; particles_k_random];
     end
      
           
@@ -76,8 +79,8 @@ for D = 1:num_data_points
     Es = [Es;E];
     Vars = [Vars;Var];
     %findRoad(E)
-    %displayHists(particles,weights)
-    %pause(1)
+    %plotRoadTargetAndGuess(image_file, U, V, u_hat, v_hat)
+    %pause(0.5)
     %close
     particles_kminus1 = particles_k;
     weights_kminus1 = weights_k;
@@ -112,12 +115,15 @@ function new_particles = resampleParticles(particles,weights,number_particles)
 end
 
 function particles = createRandomParticles(number_particles)
+
+    angle_min = -pi/4;
+    angle_max = pi/4;
     
-    particles = [randRange(-pi/8,pi/8,number_particles),...
-                 randRange(-pi/8,pi/8,number_particles),...
-                 randRange(-pi/8,pi/8,number_particles),...
-                 randRange(0.5,2,number_particles),...
-                 randRange(0.5,2,number_particles),...
+    particles = [randRange(angle_min,angle_max,number_particles),...
+                 randRange(angle_min,angle_max,number_particles),...
+                 randRange(angle_min,angle_max,number_particles),...
+                 randRange(0.5,3,number_particles),...
+                 randRange(0.5,3,number_particles),...
                  randRange(1,3,number_particles)];
 end
 
