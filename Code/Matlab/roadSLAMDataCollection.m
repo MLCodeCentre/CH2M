@@ -4,21 +4,24 @@ function roadSLAMDataCollection
 % click on the target in the photos, the coordinates of the target relative
 % to the car heading are calculated and pixels collected from the click
 
-target_1 = [472077.371; 105732.673; 0]; %right arrow
-%target_2 = [472082.638; 105729.771; 0]; %left arrow
-%target_3 = [472080.022; 105730.374; 0]; %lane marker after left arrow. 
+targets = [471311.005, 105928.217, 0; %first white square
+           471251.911, 105932.695, 0; %first chevron
+           471267.891, 105939.701, 0; %second post on the right
+           471294.136, 105930.674, 0]';%second white sqaure 
+       
+num_targets = size(targets,2);
 
 close all
 nav_data = readtable(fullfile(dataDir(),'A27','Year2','Nav','Nav.csv'));
 
 camera = 2;
 PCDATE = 2367;
-PCTIMES = 759:780;
+PCTIMES = 1174;
 
 h = 0;
 
 num_files = length(PCTIMES);
-data_points = zeros(num_files,5);
+data_points = [];
 file_names = {};
 
 disp('click on the target for each photo')
@@ -28,39 +31,36 @@ for ind = 1:num_files
     PCTIME = PCTIMES(ind);
     % get file from Camera, PCDATE and PCTIME and finding x,y,z
     image_file = strcat(num2str(camera),'_',num2str(PCDATE),'_',num2str(PCTIME),'.jpg');
-    image_nav = nav_data(nav_data.PCDATE == PCDATE & nav_data.PCTIME == PCTIME,{'XCOORD','YCOORD','HEADING'});
-    photo = [image_nav.XCOORD; image_nav.YCOORD; h];
-    theta = image_nav.HEADING;
+    image_nav = nav_data(nav_data.PCDATE == PCDATE & nav_data.PCTIME == PCTIME,{'XCOORD','YCOORD','HEADING','PITCH','ROLL'});
+    photo = [image_nav.XCOORD, image_nav.YCOORD, h]';
+    pan = image_nav.HEADING;
+    tilt = image_nav.PITCH;
+    roll = image_nav.ROLL;
+    
     %Pw - position in (N,E,Z)
-    Pw1 = target_1 - photo;
-    %Pw2 = target_2 - photo;
-    %Pw3 = target_3 - photo;
+    Pw = bsxfun(@minus,targets,photo);
     %Pc - position in camera coords
-    Pc1 = toCameraCoords(Pw1,theta)
-    %Pc2 = toCameraCoords(Pw2,theta);
-    %Pc3 = toCameraCoords(Pw3,theta);
+    Pc = toCameraCoords(Pw,pan,0,0);
+    
        
     %% getting U,V from click info
     full_image_file = fullfile(dataDir(),'A27','Year2','Images',image_file);
     I = imread(full_image_file);
     imshow(I);
-    [U,V] = ginput(1);
-    u1 = ceil(U(1));
-    v1 = ceil(V(1));
-%     u2 = ceil(U(2));
-%     v2 = ceil(V(2));
-%     u3 = ceil(U(3));
-%     v3 = ceil(V(3));
-    data_points(ind,:) = [Pc1(2),Pc1(1),Pc1(3),u1,v1];
-    file_names{ind} = full_image_file;
+    [U,V] = ginput(num_targets);
+    
+    data_points = [data_points; Pc', ceil(U), ceil(V)];
+    for file_names_ind = ind:ind + num_targets - 1
+        file_names{file_names_ind} = full_image_file;
+    end
     %data_points(3*ind-2,:) = [Pc1(2),Pc1(1),Pc1(3),u1,v1]
     %data_points(3*ind-1,:) = [Pc2(2),Pc2(1),Pc2(3),u2,v2]
     %data_points(3*ind,:) = [Pc3(2),Pc3(1),Pc3(3),u3,v3]
 end
 
 disp('saving table to target_data.csv')
-file_dir = fullfile(dataDir(),'A27','Year2','target_data_one_arrow.csv');
-data_point_table = array2table(data_points, 'VariableNames', {'x','y','z','u','v'});
+file_dir = fullfile(dataDir(),'A27','Year2','target_data_road_picture.csv');
+data_point_table = array2table(data_points, 'VariableNames', {'y','x','z','u','v'});
 file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
 table = [file_name_table, data_point_table];
 writetable(table,file_dir)

@@ -1,42 +1,26 @@
-function solveCameraEquations
-
-syms A B G L1 L2 h
-% defining full rotation matrix
-R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*sin(B)*cos(A);
-      sin(G)*cos(B),  cos(G)*cos(A)+sin(G)*sin(B)*sin(A), -cos(G)*sin(A)+sin(G)*sin(B)*cos(A);
-     -sin(B),         cos(B)*sin(A),                       cos(B)*cos(A)];
-
-% small angle formula
-% R = [ (1-((G^2)/2)   -((B^2)/2)), -G*(1-(A^2/2)) + (1-((G^2)/2))*B*A,    B*(1-((G^2)/2) - ((A^2)/2));
-%       G*(1-(B^2)/2),  (1-(B^2)/2)*(1-(B^2)/2) + G*B*A, -A + G*B;
-%      -B,  A,          1];
-
-% system constants
-cx = 1280; cy = 1024; m = 2560; n = 2048;
+function theta_solve = solveCameraEquations
 
 % loading data
 close all
-file_dir = fullfile(dataDir(),'A27','Year2','target_data.csv');
+file_dir = fullfile(dataDir(),'A27','Year2','target_data_road_picture.csv');
 data_points = readtable(file_dir);
 
-eqs = [];
+D = 2;
+N = 2;
 
-for D = 1:3
-    %% getting new data point and getting distance from each particle
-    data_point = data_points(D,:);
-    u = data_point.u - cx;
-    v = cy - data_point.v;
-    x = data_point.x-2.05;
-    y = data_point.y;
-    z = 0;
+u = data_points(D:D+N,:).u;
+v = data_points(D:D+N,:).v;
+x = data_points(D:D+N,:).x - 2.05;
+y = data_points(D:D+N,:).y;
+z = zeros(length(D:D+N),1);
     
-    eqU = (u*R(1,1) - m*L1*R(2,1))*x + (u*R(1,2) - m*L1*R(2,2))*y + (u*R(1,3) - m*L1*R(2,3))*(z-h) == 0;
-    eqV = (v*R(1,1) - n*L2*R(3,1))*x + (v*R(1,2) - n*L2*R(3,2))*y + (v*R(1,3) - n*L2*R(3,3))*(z-h) == 0;
-    
-    eqs = [eqs; eqU; eqV];
-end
+coords = [x,y,z,u,v];
+theta_0 = [0,0,0,1,1,3];
+
+options = optimoptions('fsolve','Display','iter-detailed');
+f = @(theta) cameraEquationFunction(theta,coords);
+[theta_solve,fval,exitflag,output] = fsolve(f,theta_0,options);
+theta_solve,fval,exitflag
+findRoad(theta_solve)
 
 
-sol = vpasolve(eqs,[A,B,G,L1,L2,h]);
-params = [sol.A, sol.B, sol.G, sol.L1, sol.L2, sol.h];
-findRoad(params)

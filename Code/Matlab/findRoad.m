@@ -5,6 +5,22 @@ function findRoad(X)
 img_file = fullfile(dataDir(),'A27','Year2','Images','2_2367_1174.jpg');
 %img_file = fullfile(dataDir(),'A27','Year2','Images','2_2369_8551.jpg');
 
+L = [471315.967; 105923.431; 0];
+P = [471321.890; 105924.910; 0];
+R = [471316.441; 105927.924; 0];
+
+LPw = L-P;
+RPw = R-P;
+
+image_nav = getNavFromFile(img_file,'A27','Year2');
+pan = image_nav.HEADING;
+tilt = image_nav.PITCH;
+roll = image_nav.ROLL;
+
+LPc = toCameraCoords(LPw,pan,0,0)
+RPc = toCameraCoords(RPw,pan,0,0)
+
+
 I = imread(img_file);
 imshow(I);
 hold on
@@ -25,10 +41,10 @@ R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*
 params = config();
 
 % define table co-ordinates relative to the camera
-X = 6:28;
+X = 5.84:80;
 X = X - params.r2;
 
-Y = -2.35:0.2:1.1;
+Y = -2.35:0.2:2.16;
 z = -h;
 
 m = 2560; cx = 1280; % >
