@@ -6,11 +6,11 @@ function assetManagement
 config = cameraConfig();
 
 camera = 2;
-min_distance = 20;
-max_distance = 100;
+min_distance = 10;
+max_distance = 50;
 
-target_Northing = 470928.06; target_Easting = 105971.046;
-images = getImages(target_Northing,target_Easting,'A27',{'Year2'},...
+target_Northing = 470928.06; target_Easting = 105971.046; target_height = 1;
+images = getImages(target_Northing,target_Easting,'A27',{'Year1','Year2'},...
                    camera,min_distance,max_distance);
 
 num_images = size(images,1);
@@ -22,32 +22,35 @@ for image_num = 1:10:num_images
     params = config(image.Year);
     
     Pc = getXYZ([image.Northing; image.Easting; params.h],...
-                [target_Northing; target_Easting; 1],...
+                [target_Northing; target_Easting; target_height],...
                  image.Heading);
              
     width = 3;
-    height = 4;
+    height = 3;
                   
-    x = Pc(1); Y = Pc(2)-width:0.5:Pc(2)+width; Z = -2.5:0.5:Pc(3)+height;
+    x = Pc(1); y = Pc(2); z = Pc(3);
     %Y = Pc(2);
-    if x > 6
-        close
+    if x > 6 & y < 10 
+        close all
         img_file = fullfile(dataDir(),'A27',image.Year,'Images',image.File_Name);
         I = imread(img_file);
-        imshow(I);
-        hold on
-        for y = Y
-            [u,v] = getPixelsFromCoords(x,y,Z,params);
-            plot(u,v,'ro')
-            U = [U,u];
-            V = [V,v];
-        end
+        %imshow(I);
+        %hold on
+
+        [u,v] = getPixelsFromCoords(x,y,z,params);
+        %plot(u,v,'ro')
         %pause(0.5)       
+        CW = 250;
+        XMIN = u - CW; WIDTH = 2*CW;
+        YMIN = v - CW; HEIGHT = 2*CW;
+        crop = imcrop(I,[XMIN, YMIN, WIDTH, HEIGHT]);
+        crop_resized = imresize(crop,[512,512]);
         
-        XMIN = min(U); WIDTH = max(U) - XMIN;
-        YMIN = min(V); HEIGHT = max(V) - YMIN;
-        imcrop(I,[XMIN, YMIN, WIDTH, HEIGHT]);
-        next = input('Press Enter for next data point');
+        file = strcat([image.Year,'_',image.File_Name]);
+        out_dir = fullfile(dataDir(),'Asset Monitoring','A27');
+        out_file = fullfile(out_dir, file);
+        imwrite(crop,out_file);
+        %next = input('Press Enter for next data point');
         
     end
 end
