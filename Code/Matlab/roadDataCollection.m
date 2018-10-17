@@ -4,18 +4,15 @@ function roadDataCollection(road,year,camera,PCDATE,PCTIMES)
 % click on the target in the photos, the coordinates of the target relative
 % to the car heading are calculated and pixels collected from the click
 
+%% target data
+% original road
 targets = [471327.998, 105925.655, 0; %first square
            471323.669, 105922.471, 0;  % divet on the left
            471311.028, 105928.213, 0]'; % second sqaure
-  
-
-% targets = [471311.005, 105928.217, 0; %first white square
-%            471251.911, 105932.695, 0; %first chevron
-%            471267.891, 105939.701, 0; %second post on the right
-%            471294.136, 105930.674, 0]';%second white sqaure 
-
-% targets = [471311.005, 105928.217, 0; %first white square
-%            471294.136, 105930.674, 0]';%second white sqaure 
+%  
+% targets = [469820.632, 105732.829, 0;
+%            469823.987, 105730.202, 0;
+%            469826.478, 105729.350, 0]';
        
 num_targets = size(targets,2);
 
@@ -27,7 +24,7 @@ h = 0;
 num_files = length(PCTIMES);
 data_points = [];
 file_names = {};
-
+%% getting pixels and coords
 disp('click on the target for each photo')
 
 for ind = 1:num_files
@@ -52,8 +49,8 @@ for ind = 1:num_files
     I = imread(full_image_file);
     imshow(I);
     [U,V] = ginput(num_targets);
-    
-    data_points = [data_points; Pc', ceil(U), ceil(V)];
+    new_data_point = [Pc', ceil(U), ceil(V)]
+    data_points = [data_points; new_data_point];
     for file_names_ind = (ind-1)*num_targets + 1:ind*num_targets
         file_names{file_names_ind} = full_image_file;
     end
@@ -63,7 +60,7 @@ for ind = 1:num_files
 end
 
 disp('saving table to target_data.csv')
-file_dir = fullfile(dataDir(),road,year,'target_data_road_picture.csv');
+file_dir = fullfile(dataDir(),road,year,'target_data_road_2.csv');
 data_point_table = array2table(data_points, 'VariableNames', {'y','x','z','u','v'});
 file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
 table = [file_name_table, data_point_table];

@@ -1,7 +1,7 @@
 function F = cameraEquationFunction(theta,coords,system_params)
 % constants
 A = theta(1); B = theta(2); G = theta(3); L1 = theta(4); L2 = theta(5); h = theta(6);
-x0 = theta(7); y0 = theta(8);
+x0 = system_params(5); y0 = system_params(6);
 
 x = coords(:,1); y = coords(:,2); z = coords(:,3); u = coords(:,4); v = coords(:,5);
 

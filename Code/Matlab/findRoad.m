@@ -1,4 +1,4 @@
-function findRoad(X,road,year)
+function findRoad(X,system_params,road,year)
 %close all;
 if strcmp(year,'Year1')
     img_file = fullfile(dataDir(),road,year,'Images','2_1308_1363.jpg');
@@ -37,7 +37,7 @@ hold on
 
 A = X(1); B = X(2); G = X(3);
 L1 = X(4); L2 = X(5);
-h = X(6); x0 = X(7); y0 = X(8);
+h = X(6);
 
 % defining full rotation matrix
 R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*sin(B)*cos(A);
@@ -51,8 +51,8 @@ X = x_range;
 
 Y = y_range;
 
-m = 2560; cx = 1280; % >
-n = 2048; cy = 1024; % ^
+cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
+x0 = system_params(5); y0 = system_params(6);
 
 
 %% find coordinates of road on picture
