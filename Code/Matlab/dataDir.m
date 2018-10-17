@@ -1,2 +1,2 @@
 function path = dataDir()
- path = 'C:\CH2MData';
+ path = 'C:\Users\Tom\Phd\CH2M\Data';

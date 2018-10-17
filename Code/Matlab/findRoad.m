@@ -12,13 +12,13 @@ R = [471316.441; 105927.924; 0];
 LPw = L-P;
 RPw = R-P;
 
-image_nav = getNavFromFile(img_file,'A27','Year2');
-pan = image_nav.HEADING;
-tilt = image_nav.PITCH;
-roll = image_nav.ROLL;
+%image_nav = getNavFromFile(img_file,'A27','Year2');
+%pan = image_nav.HEADING;
+%tilt = image_nav.PITCH;
+%roll = image_nav.ROLL;
 
-LPc = toCameraCoords(LPw,pan,0,0)
-RPc = toCameraCoords(RPw,pan,0,0)
+LPc = toCameraCoords(LPw,0,0,0);
+RPc = toCameraCoords(RPw,0,0,0);
 
 
 I = imread(img_file);
@@ -41,7 +41,7 @@ R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*
 params = config();
 
 % define table co-ordinates relative to the camera
-X = 5.84:80;
+X = 5.84:20;
 X = X - params.r2;
 
 Y = -2.35:0.2:2.16;
