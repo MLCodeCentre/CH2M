@@ -1,36 +1,42 @@
-function findRoad(X)
-
+function findRoad(X,system_params,road,year)
 %close all;
+if strcmp(year,'Year1')
+    img_file = fullfile(dataDir(),road,year,'Images','2_1308_1363.jpg');
+elseif strcmp(year,'Year2')
+    img_file = fullfile(dataDir(),road,year,'Images','2_2367_1174.jpg');
+elseif strcmp(year,'Year3')
+    img_file = fullfile(dataDir(),road,year,'Images','2_559_896.jpg');
+end
 
-img_file = fullfile(dataDir(),'A27','Year2','Images','2_2367_1174.jpg');
-%img_file = fullfile(dataDir(),'A27','Year2','Images','2_2369_8551.jpg');
+image_nav = getNavFromFile(img_file,road,year);
+
+P = [image_nav.XCOORD; image_nav.YCOORD; 0];
 
 L = [471315.967; 105923.431; 0];
-P = [471321.890; 105924.910; 0];
-R = [471316.441; 105927.924; 0];
+RB = [471316.441; 105927.454; 0];
+RT = [471305.767; 105929.607; 0];
 
 LPw = L-P;
-RPw = R-P;
+RBPw = RB-P;
+RTPw = RT-P;
 
-%image_nav = getNavFromFile(img_file,'A27','Year2');
-%pan = image_nav.HEADING;
-%tilt = image_nav.PITCH;
-%roll = image_nav.ROLL;
+pan = image_nav.HEADING;
+tilt = image_nav.PITCH;
+roll = image_nav.ROLL;
 
-LPc = toCameraCoords(LPw,0,0,0);
-RPc = toCameraCoords(RPw,0,0,0);
+LPc = toCameraCoords(LPw,pan,0,0);
+RBPc = toCameraCoords(RBPw,pan,0,0);
+RTPc = toCameraCoords(RTPw,pan,0,0);
 
+y_range = LPc(1):0.2:RBPc(1);
+x_range = RBPc(2):RTPc(2);
 
 I = imread(img_file);
 imshow(I);
 hold on
 
-A = X(1); 
-B = X(2);
-G = X(3);
-L1 = X(4);
-L2 = X(5);
-% hopefully this will be known in the future.
+A = X(1); B = X(2); G = X(3);
+L1 = X(4); L2 = X(5);
 h = X(6);
 
 % defining full rotation matrix
@@ -41,27 +47,26 @@ R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*
 params = config();
 
 % define table co-ordinates relative to the camera
-X = 5.84:20;
-X = X - params.r2;
+X = x_range;
 
-Y = -2.35:0.2:2.16;
-z = -h;
+Y = y_range;
 
-m = 2560; cx = 1280; % >
-n = 2048; cy = 1024; % ^
+cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
+x0 = system_params(5); y0 = system_params(6);
 
 
 %% find coordinates of road on picture
 
 U = [];
 V = [];
+z = 0;
 for y = Y
     for x = X
-        u = m*L1*((R(2,1)*x + R(2,2)*y + R(2,3)*z)...
-                 /(R(1,1)*x + R(1,2)*y + R(1,3)*z)) + cx;
+        u = m*L1*((R(2,1)*(x-x0) + R(2,2)*(y-y0) + R(2,3)*(z-h))...
+                 /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cx;
 
-        v = -n*L2*((R(3,1)*x + R(3,2)*y + R(3,3)*z)...
-                  /(R(1,1)*x + R(1,2)*y + R(1,3)*z)) + cy;
+        v = -n*L2*((R(3,1)*(x-x0) + R(3,2)*(y-y0) + R(3,3)*(z-h))...
+                  /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cy;
 
         U = [U,u];
         V = [V,v];
@@ -74,13 +79,14 @@ end
 
 U = [];
 V = [];
+z = 0;
 for x = X
     for y = Y
-        u = m*L1*((R(2,1)*x + R(2,2)*y + R(2,3)*z)...
-                 /(R(1,1)*x + R(1,2)*y + R(1,3)*z)) + cx;
+        u = m*L1*((R(2,1)*(x-x0) + R(2,2)*(y-y0) + R(2,3)*(z-h))...
+                 /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cx;
 
-        v = -n*L2*((R(3,1)*x + R(3,2)*y + R(3,3)*z)...
-                  /(R(1,1)*x + R(1,2)*y + R(1,3)*z)) + cy;
+        v = -n*L2*((R(3,1)*(x-x0) + R(3,2)*(y-y0) + R(3,3)*(z-h))...
+                  /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cy;
 
         U = [U,u];
         V = [V,v];

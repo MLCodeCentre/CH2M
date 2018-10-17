@@ -1,29 +1,30 @@
-function roadSLAMDataCollection
+function roadDataCollection(road,year,camera,PCDATE,PCTIMES)
 
 % script to collect x,y,z,u,v data points from known target, the user will
 % click on the target in the photos, the coordinates of the target relative
 % to the car heading are calculated and pixels collected from the click
 
-targets = [471311.005, 105928.217, 0; %first white square
-           471251.911, 105932.695, 0; %first chevron
-           471267.891, 105939.701, 0; %second post on the right
-           471294.136, 105930.674, 0]';%second white sqaure 
+%% target data
+% original road
+targets = [471327.998, 105925.655, 0; %first square
+           471323.669, 105922.471, 0;  % divet on the left
+           471311.028, 105928.213, 0]'; % second sqaure
+%  
+% targets = [469820.632, 105732.829, 0;
+%            469823.987, 105730.202, 0;
+%            469826.478, 105729.350, 0]';
        
 num_targets = size(targets,2);
 
 close all
-nav_data = readtable(fullfile(dataDir(),'A27','Year2','Nav','Nav.csv'));
-
-camera = 2;
-PCDATE = 2367;
-PCTIMES = 1174;
+nav_data = readtable(fullfile(dataDir(),road,year,'Nav','Nav.csv'));
 
 h = 0;
 
 num_files = length(PCTIMES);
 data_points = [];
 file_names = {};
-
+%% getting pixels and coords
 disp('click on the target for each photo')
 
 for ind = 1:num_files
@@ -44,13 +45,13 @@ for ind = 1:num_files
     
        
     %% getting U,V from click info
-    full_image_file = fullfile(dataDir(),'A27','Year2','Images',image_file);
+    full_image_file = fullfile(dataDir(),road,year,'Images',image_file);
     I = imread(full_image_file);
     imshow(I);
     [U,V] = ginput(num_targets);
-    
-    data_points = [data_points; Pc', ceil(U), ceil(V)];
-    for file_names_ind = ind:ind + num_targets - 1
+    new_data_point = [Pc', ceil(U), ceil(V)]
+    data_points = [data_points; new_data_point];
+    for file_names_ind = (ind-1)*num_targets + 1:ind*num_targets
         file_names{file_names_ind} = full_image_file;
     end
     %data_points(3*ind-2,:) = [Pc1(2),Pc1(1),Pc1(3),u1,v1]
@@ -59,7 +60,7 @@ for ind = 1:num_files
 end
 
 disp('saving table to target_data.csv')
-file_dir = fullfile(dataDir(),'A27','Year2','target_data_road_picture.csv');
+file_dir = fullfile(dataDir(),road,year,'target_data_road_2.csv');
 data_point_table = array2table(data_points, 'VariableNames', {'y','x','z','u','v'});
 file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
 table = [file_name_table, data_point_table];
