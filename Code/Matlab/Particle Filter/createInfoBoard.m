@@ -1,10 +1,9 @@
 function createInfoBoard(Es,Vars,theta,u_target,v_target,K,k,ymins,ymaxs)
 
 h = figure('units','normalized','outerposition',[0 0 1 1]);
-%set(h,'visible','off');
+set(h,'visible','off');
 subplot(6,2,[2,4,6,8,10,12])
 findRoad(theta)
-
 
 subplot(6,2,1)
 alphas = Es(:,1);

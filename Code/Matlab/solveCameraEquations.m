@@ -86,13 +86,13 @@ end
 % findRoad(theta_solve)
 
 %%displaying results
-Solver = {'patternsearch';'fminsearch';'particleswarm';'ga';'fminunc';'fmincon'};
-FVal = [fvalps,fvalfms,fvalpsw,fvalga,fvalfmu,fvalfmc]';
-NumEval = [outputps.funccount,outputfms.funcCount,outputpsw.funccount,...
-    outputga.funccount,outputfmu.funcCount,outputfmc.funcCount]';
-results = table(Solver,FVal,NumEval)
+% Solver = {'patternsearch';'fminsearch';'particleswarm';'ga';'fminunc';'fmincon'};
+% FVal = [fvalps,fvalfms,fvalpsw,fvalga,fvalfmu,fvalfmc]';
+% NumEval = [outputps.funccount,outputfms.funcCount,outputpsw.funccount,...
+%     outputga.funccount,outputfmu.funcCount,outputfmc.funcCount]';
+% results = table(Solver,FVal,NumEval)
 
-theta_solve = xfmc; fval = fvalfmc;
+theta_solve = xfmu; fval = fvalfmu;
 findRoad(theta_solve,system_params,road,year)
 Alpha = rad2deg(theta_solve(1)); Beta = rad2deg(theta_solve(2)); Gamma = rad2deg(theta_solve(3));
 L1 = theta_solve(4); L2 = theta_solve(5); h = theta_solve(6); x0 = x_cam; y0 =y_cam;
