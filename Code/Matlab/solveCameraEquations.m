@@ -23,12 +23,12 @@ fprintf('%d data points in %s\n',size(data_points,1),year);
 
 %% solving 
 Num_Targets = 3;
-D = 1;
+D = 18;
 N = size(data_points,1)-D;
 
 thetas = [];
 
-for n = 3
+for n = 2
 
 u = data_points(D:D+n,:).u;
 v = data_points(D:D+n,:).v;
@@ -73,7 +73,7 @@ options = optimoptions('fminunc','MaxFunctionEvaluations',1000,'FunctionToleranc
 [xfmu,fvalfmu,eflagfmu,outputfmu] = fminunc(f,theta_0,options);
 disp('---------------------')
 disp('Running fmincon')
-[xfmc,fvalfmc,eflagfmc,outputfmc] = fmincon(f,theta_0,[],[],[],[],lb,ub)
+[xfmc,fvalfmc,eflagfmc,outputfmc] = fmincon(f,theta_0,[],[],[],[],lb,ub);
 
 
 end
