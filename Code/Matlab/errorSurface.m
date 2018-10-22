@@ -21,7 +21,7 @@ data_points = readtable(file_dir);
 fprintf('%d data points in %s\n',size(data_points,1),year);
 
 D = 18;
-N = 2;
+N = 3;
 
 u = data_points(D:D+N,:).u;
 v = data_points(D:D+N,:).v;
@@ -36,10 +36,10 @@ theta_0 = [0,0,0,1,1,3];
 
 f = @(theta) cameraEquationFunction(theta,coords,system_params);
 options = optimoptions('fminunc','MaxFunctionEvaluations',1000,'FunctionTolerance',1E-08,'Display','off');
-[theta_solve,fvalfmu,eflagfmu,outputfmu] = fminunc(f,theta_0,options);
+[theta_solve,fvalfmu,eflagfmu,outputfmu] = fminunc(f,theta_0,options)
 
-plotChanges(theta_solve, coords, system_params, [1,0,0,0,0,0], -0.01:0.0001:0.01, '\alpha')
-plotChanges(theta_solve, coords, system_params, [0,1,0,0,0,0], -0.5:0.01:0.5, '\beta')
+plotChanges(theta_solve, coords, system_params, [1,0,0,0,0,0], -0.001:0.0001:0.001, '\alpha')
+plotChanges(theta_solve, coords, system_params, [0,1,0,0,0,0], -0.01:0.01:0.01, '\beta')
 plotChanges(theta_solve, coords, system_params, [0,0,1,0,0,0], -0.5:0.01:0.5, '\gamma')
 plotChanges(theta_solve, coords, system_params, [0,0,0,1,0,0], -0.4:0.01:0.4, 'L1')
 plotChanges(theta_solve, coords, system_params, [0,0,0,0,1,0], -0.4:0.01:0.4, 'L2')
