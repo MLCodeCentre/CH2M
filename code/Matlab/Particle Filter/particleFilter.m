@@ -4,13 +4,13 @@ function particleFilter
 number_particles = 10000;
 effective_ratio = 0.5;
 likelihood_sigma = 500;
-num_random_particles = 200;
+num_random_particles = 500;
 delta_angle = 0.0001;
 
-num_points_in_pic = 1;
+num_points_in_pic = 3;
 
 close all
-file_dir = fullfile(dataDir(),'A27','Year2','target_data_one_arrow.csv');
+file_dir = fullfile(dataDir(),'A27','Year2','target_data.csv');
 data_points = readtable(file_dir);
 num_data_points = size(data_points,1);
 
@@ -83,7 +83,7 @@ for k = 1:num_points_in_pic:num_data_points
     %pause(1)
     ymins = [-pi/4,-pi/4,-pi/4,0,0,0];
     ymaxs = [pi/4,pi/4,pi/4,3,3,3];
-    createInfoBoard(Es,Vars,E,U,V,num_data_points,k,ymins,ymaxs)
+    %createInfoBoard(Es,Vars,E,U,V,num_data_points,k,ymins,ymaxs)
     %pause(1)
     close
 
