@@ -7,50 +7,77 @@ config = cameraConfig();
 
 camera = 2;
 min_distance = 10;
-max_distance = 50;
+max_distance = 30;
 
-target_Northing = 470928.06; target_Easting = 105971.046; target_height = 1;
-images = getImages(target_Northing,target_Easting,'A27',{'Year1','Year2'},...
+years = {'Year1','Year2'};
+%years = {'Year1'}
+num_years = length(years);
+
+for year_ind = 1:num_years
+    
+    year = years{year_ind};
+    target_Northing = 469621.023; target_Easting = 105972.694; target_height = 0;
+    images = getImages(target_Northing,target_Easting,'A27',year,...
                    camera,min_distance,max_distance);
 
-num_images = size(images,1);
+    num_images = size(images,1);
 
-for image_num = 1:10:num_images
-    U = [];
-    V = [];
-    image = images(image_num,:);
-    params = config(image.Year);
-    
-    Pc = getXYZ([image.Northing; image.Easting; params.h],...
-                [target_Northing; target_Easting; target_height],...
-                 image.Heading);
-             
-    width = 3;
-    height = 3;
-                  
-    x = Pc(1); y = Pc(2); z = Pc(3);
-    %Y = Pc(2);
-    if x > 6 & y < 10 
-        close all
-        img_file = fullfile(dataDir(),'A27',image.Year,'Images',image.File_Name);
-        I = imread(img_file);
-        %imshow(I);
-        %hold on
+    for image_num = 1:2:num_images
+        U = [];
+        V = [];
+        image = images(image_num,:)
+        params = config(image.Year);
 
-        [u,v] = getPixelsFromCoords(x,y,z,params);
-        %plot(u,v,'ro')
-        %pause(0.5)       
-        CW = 250;
-        XMIN = u - CW; WIDTH = 2*CW;
-        YMIN = v - CW; HEIGHT = 2*CW;
-        crop = imcrop(I,[XMIN, YMIN, WIDTH, HEIGHT]);
-        crop_resized = imresize(crop,[512,512]);
+        Pc = getXYZ([image.Northing; image.Easting; params.h],...
+                    [target_Northing; target_Easting; target_height],...
+                     image.Heading)
+
+        width = 1;
+        height = 10;
+
+        x = Pc(1); y = Pc(2); z = Pc(3);
+        Y = y-width:y+width;
+        Z = 0:0+height;
         
-        file = strcat([image.Year,'_',image.File_Name]);
-        out_dir = fullfile(dataDir(),'Asset Monitoring','A27');
-        out_file = fullfile(out_dir, file);
-        imwrite(crop,out_file);
-        %next = input('Press Enter for next data point');
-        
+        if x > 12 & abs(y) < 8 
+            [x,y,z]
+            close all
+            img_file = fullfile(dataDir(),'A27',image.Year,'Images',erase(image.File_Name,' '));
+            I = imread(img_file);
+            imshow(I); hold on
+
+            for y = Y
+                for z = Z
+                    [u,v] = getPixelsFromCoords(x,y,z,params);
+                    plot(u,v,'ro')
+                    U = [U,u];
+                    V = [V,v];
+                end
+            end
+            
+%             for y = -4:4
+%                 for x = 5:20
+%                     [u,v] = getPixelsFromCoords(x,y,0,params);
+%                     plot(u,v,'bo')
+%                     U = [U,u];
+%                     V = [V,v];
+%                 end
+%             end
+
+            Umin = max(0,min(U)); Umax = min(params.m,max(U));
+            Vmin = max(0,min(V)); Vmax = min(params.n,max(V));
+            width = Umax - Umin; height = Vmax - Vmin;
+            crop = imcrop(I,[Umin,Vmin,width,height]);
+
+            crop_resized = imresize(crop,[params.m/4,params.n/4]);
+            %imshow(crop_resized)
+
+            file = strcat([image.Year,'_',image.File_Name]);
+            out_dir = fullfile(dataDir(),'Asset Monitoring','A27');
+            out_file = fullfile(out_dir, file);
+            imwrite(crop,out_file);
+            next = input('Press Enter for next data point');
+
+        end
     end
 end

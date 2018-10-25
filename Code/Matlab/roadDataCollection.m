@@ -6,9 +6,12 @@ function roadDataCollection(road,year,camera,PCDATE,PCTIMES)
 
 %% target data
 % original road
-targets = [471327.998, 105925.655, 0; %first square
+targets = [471327.998, 105925.655, 0; %first square           
            471323.669, 105922.471, 0;  % divet on the left
-           471311.028, 105928.213, 0]'; % second sqaure
+           471311.028, 105928.213, 0; % second square
+           471319.254, 105922.842, 0]';
+           %
+           
 %  
 % targets = [469820.632, 105732.829, 0;
 %            469823.987, 105730.202, 0;
@@ -59,8 +62,9 @@ for ind = 1:num_files
     %data_points(3*ind,:) = [Pc3(2),Pc3(1),Pc3(3),u3,v3]
 end
 
-disp('saving table to target_data.csv')
-file_dir = fullfile(dataDir(),road,year,'target_data_road_2.csv');
+file_name = 'target_data_road_4_targets.csv';
+fprintf('saving table to %s', file_name);
+file_dir = fullfile(dataDir(),road,year,file_name);
 data_point_table = array2table(data_points, 'VariableNames', {'y','x','z','u','v'});
 file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
 table = [file_name_table, data_point_table];
