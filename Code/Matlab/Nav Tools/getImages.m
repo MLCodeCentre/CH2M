@@ -3,7 +3,7 @@ function images = getImages(easting, northing, road, year, camera, min_distance,
 % for all years in years.
 
 % loading navFile from that year
-nav_file = readtable(fullfile(dataDir(),road,year,'Nav','Nav.csv'));
+nav_file = readtable(fullfile(dataDir(),year,road,'Nav','Nav.csv'));
 distances = sqrt((nav_file.XCOORD - easting).^2 + (nav_file.YCOORD - northing).^2);
 nav_file = nav_file(distances>min_distance & distances<max_distance, ...
                    {'XCOORD','YCOORD','HEADING','PCDATE','PCTIME',...
@@ -19,12 +19,13 @@ File_Name = char(strcat([num2str(repmat(num2str(camera),[num_images,1])), ...
                    repmat('_',[num_images,1]),...
                    num2str(nav_file.PCTIME),...
                    num2str(repmat('.jpg',[num_images,1]))...
-                   ]));
+                   ]))
 
 Northing = nav_file.XCOORD;
 Easting = nav_file.YCOORD;
+PCTIME = nav_file.PCTIME;
 
-images = table(File_Name, Year, Distance, Northing, Easting, Heading);
+images = table(File_Name, PCTIME, Year, Distance, Northing, Easting, Heading);
 
 end
 
