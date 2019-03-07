@@ -1,12 +1,13 @@
-function [x,y,w,h,U,V] = getBoundingBox(x,y,z,year,length,width,height)
+function [x,y,w,h,U,V] = getBoundingBox(x,y,z,year,length,width,height,camera_params)
 % takes in the image table object with accompanying width and height. 
 % if width and height aren't provided then 1m for each is assumed. 
-params_all = cameraConfig();
-params = params_all(year);
+params = camera_params(year);
 
-x_range = x-length: 0.5 : x+length;
-y_range = y-width: 0.5 : y+width;
-z_range = 0: 0.5: height;
+error_buffer = 0.5;
+
+x_range = [x, x+length];
+y_range = [y-width/2-error_buffer, y+width/2+error_buffer];
+z_range = [z-error_buffer, z+height+error_buffer];
 
 U = [];
 V = [];
@@ -27,4 +28,5 @@ v_max = max(V);
 
 x = u_min; w = u_max - u_min;
 y = v_min; h = v_max - v_min;
+
 end

@@ -9,7 +9,7 @@ year = varargin{3};
 % can either pass the nav file or load it. When running loops loading the
 % nav file form disk every time is slow.
 if nargin == 3
-    nav_file = readtable(fullfile(dataDir(),year,road,'Nav','Nav.csv')); 
+    nav_file = readtable(fullfile(dataDir(),road,year,'Nav','Nav.csv')); 
 elseif nargin == 4
     nav_file = varargin{4};
 end

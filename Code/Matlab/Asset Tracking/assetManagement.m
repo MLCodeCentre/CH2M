@@ -30,9 +30,6 @@ for dbf_file_num = 1:num_dbf_files
         if any(strcmp(field_names,'XCOORD'))
             asset_table = array2table(asset_data,'VariableNames',field_names);
             num_assets = size(asset_table,1);
-            f = waitbar(0,'',...
-            'Name',sprintf('Finding %s Assets',asset_type),...
-            'CreateCancelBtn','setappdata(gcbf,''canceling'',1)');
         
             % iterating through each asset in the dbf file
             for asset_num = 1:num_assets
@@ -97,36 +94,35 @@ for dbf_file_num = 1:num_dbf_files
                     end
                 end
                 %
-                if isempty(image) == 0
-                    %similarity = getImageSimilarity(crop_year1,crop_year2)
-                    similarity = 0.1;
-                    if similarity < 1
-                        figure('units','normalized','outerposition',[0 0 1 1])
-                        set(gcf,'Visible','off');
-                        
-                        subplot(1,num_years,1);
-                        imshow(I_year1);
-                        hold on
-                        %scatter(U1(:),V1(:),'bo')
-                        rectangle('Position',box1,'LineWidth',2,'LineStyle','--','EdgeColor','r');
-                        subplot(1,num_years,2);
-                        imshow(I_year2)
-                        hold on
-                        %scatter(U2(:),V2(:),'bo')
-                        rectangle('Position',box2,'LineWidth',2,'LineStyle','--','EdgeColor','r');
-                                                
-                        file_name = strcat([num2str(asset_num)]);
-                        print(fullfile(folder,file_name),'-dpng')
-                        %saveas(gcf,fullfile(folder,file_name))
-                        close;
-                    end
-                end
-                waitbar(asset_num/num_assets,f,sprintf('%d/%d',asset_num,num_assets));
-            end
-        end  
-    end
-end
-delete(f)
+%                 if isempty(image) == 0
+%                     %similarity = getImageSimilarity(crop_year1,crop_year2)
+%                     similarity = 0.1;
+%                     if similarity < 1
+%                         figure('units','normalized','outerposition',[0 0 1 1])
+%                         set(gcf,'Visible','off');
+%                         
+%                         subplot(1,num_years,1);
+%                         imshow(I_year1);
+%                         hold on
+%                         %scatter(U1(:),V1(:),'bo')
+%                         rectangle('Position',box1,'LineWidth',2,'LineStyle','--','EdgeColor','r');
+%                         subplot(1,num_years,2);
+%                         imshow(I_year2)
+%                         hold on
+%                         %scatter(U2(:),V2(:),'bo')
+%                         rectangle('Position',box2,'LineWidth',2,'LineStyle','--','EdgeColor','r');
+%                                                 
+%                         file_name = strcat([num2str(asset_num)]);
+%                         print(fullfile(folder,file_name),'-dpng')
+%                         %saveas(gcf,fullfile(folder,file_name))
+%                         close;
+%                     end
+                end 
+            end % assets in asset_type
+        end % if XCOORD in asset
+    end % asset_type
+end % db_files
+
 end
 
 

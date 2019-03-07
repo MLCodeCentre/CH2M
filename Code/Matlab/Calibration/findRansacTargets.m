@@ -1,4 +1,4 @@
-function findTargets(data_points,theta,system_params,inliedIdxs)
+function findRansacTargets(data_points,theta,system_params,inlierIdxs)
     
     params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
     %params.Ly = theta(4); params.Lz = theta(5);
@@ -15,10 +15,14 @@ function findTargets(data_points,theta,system_params,inliedIdxs)
     
     num_data_points = size(data_points,1);
     for i = 1:num_data_points
-       data_point = data_points(i,:);
-       plot(data_point.u, data_point.v, 'r+')
+       data_point = data_points(i,:);     
+       plot(data_point.u, data_point.v, 'k+')
        
       [u,v] = getPixelsFromCoords(data_point.x,data_point.y,data_point.z,params);
-      plot(u,v,'bo');
+      if inlierIdxs(i) == 0
+        plot(u,v,'ro');
+      else
+        plot(u,v,'bo');
+      end
     end
 end

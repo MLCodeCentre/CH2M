@@ -30,51 +30,31 @@ LPc = toCameraCoords(LPw,pan,0,0);
 RBPc = toCameraCoords(RBPw,pan,0,0);
 RTPc = toCameraCoords(RTPw,pan,0,0);
 
-y_range = LPc(1):0.2:RBPc(1);
-x_range = RBPc(2):RTPc(2);
+y_range = linspace(LPc(1),RBPc(1),5);
+x_range = linspace(RBPc(2),RTPc(2),10);
 
 I = imread(img_file);
 imshow(I);
 hold on
 
-A = theta(1); B = theta(2); G = theta(3);
-L1 = theta(4); L2 = theta(5);
-h = theta(6);
-
-% defining full rotation matrix
-R = [ cos(G)*cos(B), -sin(G)*cos(A)+cos(G)*sin(B)*sin(A),  sin(G)*sin(A)+cos(G)*sin(B)*cos(A);
-      sin(G)*cos(B),  cos(G)*cos(A)+sin(G)*sin(B)*sin(A), -cos(G)*sin(A)+sin(G)*sin(B)*cos(A);
-     -sin(B),         cos(B)*sin(A),                       cos(B)*cos(A)];
-
 params = config();
 
-% define table co-ordinates relative to the camera
+%cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
+params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
+params.L1 = theta(4); params.L2 = theta(5);
+params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
+
+params.cx = system_params(1); params.cy = system_params(2); 
+params.m = system_params(3); params.n = system_params(4);
 
 
-%max(x_range)
-%min(x_range)
-%max(y_range)
-%min(y_range)
-%y_dist = max(y_range) - min(y_range)
-
-cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
-%x0 = system_params(5); y0 = system_params(6);
-
-x0 = theta(7); y0 = theta(8);
-
-
-%% find coordinates of road on picture
+%% some coords
 U = [];
 V = [];
-x = 10;
-for z = 0:3
-    for y = -7:7        
-        u = m*L1*((R(2,1)*(x-x0) + R(2,2)*(y-y0) + R(2,3)*(z-h))...
-                 /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cx;
-
-        v = -n*L2*((R(3,1)*(x-x0) + R(3,2)*(y-y0) + R(3,3)*(z-h))...
-                  /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cy;
-
+z = 0.6;
+for x = 5:15
+    for y = -4        
+        [u,v] = getPixelsFromCoords(x,y,z,params);
         U = [U,u];
         V = [V,v];
     end
@@ -84,6 +64,7 @@ for z = 0:3
     V = [];
 end
 
+%% road
 U = [];
 V = [];
 z = 0;
@@ -91,22 +72,15 @@ z = 0;
 X = x_range;
 Y = y_range;
 
-
-
 for y = Y
     for x = X
-        u = m*L1*((R(2,1)*(x-x0) + R(2,2)*(y-y0) + R(2,3)*(z-h))...
-                 /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cx;
-
-        v = -n*L2*((R(3,1)*(x-x0) + R(3,2)*(y-y0) + R(3,3)*(z-h))...
-                  /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cy;
-
+        [u,v] = getPixelsFromCoords(x,y,z,params);
         U = [U,u];
         V = [V,v];
     end
     plot(U(:),V(:),'r')
     hold on
-    U = [];
+    U = [];;
     V = [];
 end
 
@@ -115,12 +89,7 @@ V = [];
 
 for x = X
     for y = Y
-        u = m*L1*((R(2,1)*(x-x0) + R(2,2)*(y-y0) + R(2,3)*(z-h))...
-                 /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cx;
-
-        v = -n*L2*((R(3,1)*(x-x0) + R(3,2)*(y-y0) + R(3,3)*(z-h))...
-                  /(R(1,1)*(x-x0) + R(1,2)*(y-y0) + R(1,3)*(z-h))) + cy;
-
+        [u,v] = getPixelsFromCoords(x,y,z,params);
         U = [U,u];
         V = [V,v];
     end
