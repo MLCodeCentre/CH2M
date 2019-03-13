@@ -7,14 +7,23 @@ function findRansacTargets(data_points,theta,system_params,inlierIdxs)
     
     params.cx = system_params(1); params.cy = system_params(2); 
     params.m = system_params(3); params.n = system_params(4);
-
-    image_file = data_points(1,:).image_file;
-    I = imread(image_file{1});
-    imshow(I);
-    hold on
-    
+      
     num_data_points = size(data_points,1);
+    current_image_file = '';
+    image_ind = 1;
+    num_images = length(unique(data_points.image_file))
+    
     for i = 1:num_data_points
+       image_file = data_points(i,:).image_file;
+       if strcmp(current_image_file,image_file{1}) == 0
+            subplot(ceil(num_images/2),2,image_ind)
+            I = imread(image_file{1});
+            current_image_file = image_file{1};
+            imshow(I);
+            hold on
+            image_ind = image_ind + 1;
+       end
+        
        data_point = data_points(i,:);     
        plot(data_point.u, data_point.v, 'k+')
        

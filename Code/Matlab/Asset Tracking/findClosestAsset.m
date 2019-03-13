@@ -27,7 +27,7 @@ end
 
 asset_table =[assets,table(x,y,z,u_asset,v_asset,pixel_distance)];
 % filter out negative xs and big ys
-asset_table = asset_table(asset_table.x > 0 & asset_table.x < 50, :);
+asset_table = asset_table(asset_table.x > 0 & asset_table.x < 100, :);
 asset_table = asset_table(abs(asset_table.y) < 50, :);
 % filter out large pixel distances
 asset_table = asset_table(asset_table.pixel_distance < 500, :);

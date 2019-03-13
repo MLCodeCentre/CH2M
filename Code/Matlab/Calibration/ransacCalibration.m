@@ -12,29 +12,35 @@ system_params = [cx, cy, m, n];
 
 % loading data
 close all
-file_dir = fullfile(dataDir(),road,year,'target_data_road_height_01_03.csv');
-data_points_1 = readtable(file_dir);
-num_data_points_1 = size(data_points_1,1);
+file_dir = fullfile(dataDir(),road,year,'target_data_road_height_12_03.csv');
+data_points_table1 = readtable(file_dir);
 
 file_dir = fullfile(dataDir(),road,year,'target_data_road_height_06_03.csv');
-data_points_2 = readtable(file_dir);
-data_points = [data_points_1; data_points_2];
-data_points = table2array(data_points(:,2:end));
-%data_points = data_points(data_points(:,3)==0,:);
+data_points_table2 = readtable(file_dir);
 
+file_dir = fullfile(dataDir(),road,year,'target_data_road_height_01_03.csv');
+data_points_table3 = readtable(file_dir);
+
+% file_dir = fullfile(dataDir(),road,year,'target_data_road_height_12_03_second.csv');
+% data_points_table4 = readtable(file_dir);
+
+data_points_table = [data_points_table1; data_points_table2; data_points_table3];
+
+data_points = data_points_table;
+data_points = table2array(data_points(:,2:end));
 %% ransac
 % defining ransac fitting function and distance function
 fitThetaFnc = @(data_points) solveCameraEquation(data_points,system_params);
 distFcn = @(theta,data_points) comparePixels(theta,data_points,system_params);
 % running ransac
-[theta_solve, inlierIdx] = ransac(data_points,fitThetaFnc,distFcn,8,20);
+[theta_solve, inlierIdx] = ransac(data_points,fitThetaFnc,distFcn,20,30);
 inlierIdx
 %% results
 findRoad(theta_solve,system_params,road,year);
 figure
-findRansacTargets(data_points_1,theta_solve,system_params,inlierIdx(1:num_data_points_1));
-figure
-findRansacTargets(data_points_2,theta_solve,system_params,inlierIdx(num_data_points_1+1:end));
+findRansacTargets(data_points_table,theta_solve,system_params,inlierIdx);
+% figure
+% findRansacTargets(data_points_2,theta_solve,system_params,inlierIdx(num_data_points_1+1:end));
 
 Alpha = theta_solve(1); Beta = theta_solve(2); Gamma = theta_solve(3);
 L1 = theta_solve(4); L2 = theta_solve(5); 
@@ -53,7 +59,7 @@ save = true;
 if save
    roll = Alpha; tilt = Beta; pan = Gamma;
    calibration_parameters = table(roll,tilt,pan,L1,L2,x0,y0,h,cx,cy,m,n);
-   out_file = fullfile(dataDir(),road,year,'calibration_parameters.csv');
+   out_file = fullfile(dataDir(),road,year,'calibration_parameters_test.csv');
    writetable(calibration_parameters,out_file,'QuoteStrings',true); 
    disp('saved camera parameters')
 end
@@ -101,7 +107,7 @@ function theta_solve = solveCameraEquation(data_points,system_params)
     disp('Running Global search')
     problem = createOptimProblem('fmincon','objective',f,'x0',theta_0,'lb',lb,'ub',ub);
     ms = MultiStart;
-    [xg,fg,flg,og] = run(ms,problem,3);
+    [xg,fg,flg,og] = run(ms,problem,5);
 
     theta_solve = xg;
     fval = fg;

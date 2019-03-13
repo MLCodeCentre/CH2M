@@ -48,7 +48,7 @@ boxes = boxes(Pcs_less_than_max_y,:);
 pixels = pixels(Pcs_less_than_max_y,:);
 
 % are pixels in picture
-good_pixels = pixels(:,1) < 2450 & pixels(:,1) > 100 & pixels(:,2) < 1900  & pixels(:,2) > 100;
+good_pixels = pixels(:,1) < 2500 & pixels(:,1) > 40 & pixels(:,2) < 2000  & pixels(:,2) > 200;
 nav_file = nav_file(good_pixels,:);
 Pcs = Pcs(good_pixels,:);
 boxes = boxes(good_pixels,:);
@@ -56,14 +56,18 @@ pixels = pixels(good_pixels,:);
 
 % good boxes
 good_boxes = boxes(:,1) > 0 & boxes(:,1) + boxes(:,3) < 2500 ... 
-            & boxes(:,2) > 0 & boxes(:,2) + boxes(:,4) < 2000;    
-nav_file = nav_file(good_boxes,:);
-Pcs = Pcs(good_boxes,:);
-boxes = boxes(good_boxes,:);
-pixels = pixels(good_boxes,:);
+            & boxes(:,2) > 0 & boxes(:,2) + boxes(:,4) < 2000;
+if sum(good_boxes) > 0
+    nav_file = nav_file(good_boxes,:);
+    Pcs = Pcs(good_boxes,:);
+    boxes = boxes(good_boxes,:);
+    pixels = pixels(good_boxes,:);
+end
 
-% closest x to distance
-min_ind = find(Pcs(:,2)==min(Pcs(:,2)));
+% closest
+distances = sqrt(Pcs(:,1).^2 + Pcs(:,2).^2 + Pcs(:,3).^2);
+%min_ind = find(Pcs(:,2)==min(Pcs(:,2)));
+min_ind = find(distances==min(distances));
 nav_file = nav_file(min_ind,:);
 Pc_min = Pcs(min_ind,:);
 box_min = boxes(min_ind,:);
@@ -80,9 +84,12 @@ Heading = nav_file.HEADING;
 Northing = nav_file.XCOORD;
 Easting = nav_file.YCOORD;
 
+Tilt = nav_file.PITCH;
+Roll = nav_file.ROLL;
+
 if size(Pc_min) > 0
-    image = table({File_Name}, {year}, {road}, Easting, Northing, Heading, Pc_min(2), Pc_min(1), Pc_min(3),...
-                    'VariableNames',{'File_Name','Year','Road','Easting','Northing','Heading','x','y','z'});
+    image = table({File_Name}, {year}, {road}, Easting, Northing, Heading, Tilt, Roll, Pc_min(2), Pc_min(1), Pc_min(3),...
+                    'VariableNames',{'File_Name','Year','Road','Easting','Northing','Heading','Tilt','Roll','x','y','z'});
     target_pixels = pixels_min;
 else
     image = [];

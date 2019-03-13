@@ -29,6 +29,10 @@ roll = image_nav.ROLL;
 LPc = toCameraCoords(LPw,pan,0,0);
 RBPc = toCameraCoords(RBPw,pan,0,0);
 RTPc = toCameraCoords(RTPw,pan,0,0);
+% 
+% LPc = toCameraCoords(LPw,pan,tilt,roll);
+% RBPc = toCameraCoords(RBPw,pan,tilt,roll);
+% RTPc = toCameraCoords(RTPw,pan,tilt,roll);
 
 y_range = linspace(LPc(1),RBPc(1),5);
 x_range = linspace(RBPc(2),RTPc(2),10);

@@ -502,8 +502,8 @@ for asset_num = 1:num_assets1
     u_asset = assets_in_image1(asset_num,1);
     v_asset = assets_in_image1(asset_num,2);
     box = assets_in_image1(asset_num,3:6);
-    rectangle('Position',box,'LineWidth',1,'LineStyle','-', ...
-              'EdgeColor','r','Curvature',0);
+%     rectangle('Position',box,'LineWidth',1,'LineStyle','-', ...
+%               'EdgeColor','r','Curvature',0);
     plot(u_asset, v_asset, 'g+')
     text(u_asset, v_asset, asset_types_in_image1(asset_num,:),'color','m')
 end
@@ -519,8 +519,8 @@ for asset_num = 1:num_assets2
     v_asset = assets_in_image2(asset_num,2);
     box = assets_in_image2(asset_num,3:6);
 
-    rectangle('Position',box,'LineWidth',1,'LineStyle','-', ...
-              'EdgeColor','r','Curvature',0);
+%     rectangle('Position',box,'LineWidth',1,'LineStyle','-', ...
+%               'EdgeColor','r','Curvature',0);
     plot(u_asset, v_asset, 'g+')
     text(u_asset, v_asset, asset_types_in_image2(asset_num,:), ...
         'color','m')

@@ -1,27 +1,27 @@
 function config = cameraConfig
 
 %% Year 1
-config_1.alpha = 0.0339;
-config_1.beta = -0.0170;
-config_1.gamma = -0.0185;
-config_1.L1 = 0.8207;
-config_1.L2 = 0.8015;
-config_1.h =  2.959;
-config_1.x0 = 1.5817;
-config_1.y0 = 0.044;
+config_1.alpha = 0.005906388;
+config_1.beta = -0.005755524;
+config_1.gamma = -0.039743306;
+config_1.L1 = 0.807010664;
+config_1.L2 = 1.072118766;
+config_1.h =  2.138873247;
+config_1.x0 = 1.853526008;
+config_1.y0 = -0.295400226;
 
 config_1.m = 2560; config_1.cx = 1280; % >
 config_1.n = 2048; config_1.cy = 1024; % ^
 
 %% Year 2
-config_2.alpha = -0.0309;
-config_2.beta = -0.1297;
-config_2.gamma = 0.0093;
-config_2.L1 = 0.8221;
-config_2.L2 = 0.7784;
-config_2.h = 3.0035;
-config_2.x0 = 1.7314;
-config_2.y0 = -0.0153;
+config_2.alpha = -0.029022844;
+config_2.beta = -0.0992300949692205;
+config_2.gamma = 0.0148012657417494;
+config_2.L1 = 0.790683861608002;
+config_2.L2 = 1.06975824202134;
+config_2.h = 2.35853896376169;
+config_2.x0 = 1.90895106655138;
+config_2.y0 = 0.147855024843825;
 
 config_2.m = 2560; config_2.cx = 1280; % >
 config_2.n = 2048; config_2.cy = 1024; % ^
