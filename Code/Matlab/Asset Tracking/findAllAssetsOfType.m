@@ -1,16 +1,21 @@
-function [assets_in_image1, assets_in_image2] = findAllAssetsOfType(image1,image2,asset_data_table,camera_params)
+function [assetsImage1,assetsImage2] = findAllAssetsOfType(image1,image2,assetDataTable,cameraParams)
 
-assets_in_image1 = [];
-assets_in_image2 = [];
+MIN_X = 7;
+MAX_X = 40;
+MAX_Y = 20;
 
-assets = findAssetsInImage(asset_data_table, image1, 7, 50, 50, 'Year1', camera_params);
-num_assets_image1 = size(assets,1);
-for asset_num = 1:num_assets_image1
-    assets_in_image1 = [assets_in_image1; assets(asset_num,:)];
+assetsImage1 = [];
+assetsImage2 = [];
+
+assets = findAssetsInImage(assetDataTable,image1,MIN_X,MAX_X,MAX_Y,'Year1',cameraParams);
+nAssetsImage1 = size(assets,1);
+
+for iAsset = 1:nAssetsImage1
+    assetsImage1 = [assetsImage1; assets(iAsset,:)];
 end
 
-assets = findAssetsInImage(asset_data_table, image2, 7, 50, 50, 'Year2', camera_params);
-num_assets_image2 = size(assets,1);
-for asset_num = 1:num_assets_image2
-    assets_in_image2 = [assets_in_image2; assets(asset_num,:)];
+assets = findAssetsInImage(assetDataTable,image2,MIN_X,MAX_X,MAX_Y,'Year2',cameraParams);
+nAssetsImage2 = size(assets,1);
+for iAsset = 1:nAssetsImage2
+    assetsImage2 = [assetsImage2; assets(iAsset,:)];
 end

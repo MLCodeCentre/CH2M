@@ -1,42 +1,56 @@
-function [assets_in_image1, asset_types_in_image1, assets_in_image2, asset_types_in_image2] = findAllAssets(image1,image2,asset_types,dataDir,road,camera_params)
+function [assetsImage1,assetTypesImage1,assetsImage2,assetTypesImage2] = ...
+    findAllAssets(image1,image2,assetTypes,dataDir,road,cameraParams)
+% Finds all assets by looping through all asset types, loading the asset data and calling
+% findAssetsInImage.
 
-assets_in_image1 = [];
-assets_in_image2 = [];
-asset_types_in_image1 = [];
-asset_types_in_image2 = [];
+% setting variables and lists
+MIN_X = 7;
+MAX_X = 40;
+MAX_Y = 30;
 
-asset_types = asset_types(~cellfun('isempty',asset_types));
+assetsImage1 = [];
+assetsImage2 = [];
+assetTypesImage1 = [];
+assetTypesImage2 = [];
 
-for asset_type_ind = 1:numel(asset_types)
-    asset_type = asset_types{asset_type_ind};
-    asset_type_info = strsplit(asset_type,' ');
-    asset_type = asset_type_info{1};
+%% looping through asset types
+assetTypes = assetTypes(~cellfun('isempty',assetTypes));
+nAssetTypes = numel(assetTypes);
+
+for iAssetType = 1:nAssetTypes  
+    % parsing asset code
+    assetType = assetTypes{iAssetType};
+    assetTypeInfo = strsplit(assetType,' ');
+    assetType = assetTypeInfo{1};
     
-    asset_dbf_folder = fullfile(dataDir,road,'Assets','Year2_A27_Shapefiles');   
-    asset_dbf_files = dir(fullfile(asset_dbf_folder,['*',asset_type,'*.dbf']));
+    % loading data and looping through
+    assetDbfFolder = fullfile(dataDir,road,'Assets','Year2_A27_Shapefiles');   
+    assetDbfFiles = dir(fullfile(assetDbfFolder,['*',assetType,'*.dbf']));
     
-    if isempty(asset_dbf_files) == 0
-        asset_dbf_file = asset_dbf_files(1);
-        [asset_data, field_names] = dbfRead(fullfile(asset_dbf_folder,asset_dbf_file.name));
-        asset_data_table = cell2table(asset_data,'VariableNames',field_names);
-        if any(strcmp('XCOORD',field_names))
-            
-            assets = findAssetsInImage(asset_data_table, image1, 7, 40, 30, 'Year1', camera_params);
-            num_assets_image1 = size(assets,1);
-            for asset_num = 1:num_assets_image1
-                assets_in_image1 = [assets_in_image1; assets(asset_num,:)];
-                asset_types_in_image1 = [asset_types_in_image1; asset_type];
+    if isempty(assetDbfFiles) == 0
+      
+        assetDbfFile = assetDbfFiles(1);
+        [assetData,fieldNames] = dbfRead(fullfile(assetDbfFolder,assetDbfFile.name));
+        assetDataTable = cell2table(asset_data,'VariableNames',fieldNames);
+        % if there is any location information get assets in image and
+        % append to lists
+        if any(strcmp('XCOORD',fieldNames))
+        
+            assets = findAssetsInImage(assetDataTable,image1,MIN_X,MAX_X,MAX_Y,'Year1',cameraParams);
+            nAssetsImage1 = size(assets,1);
+            for iAsset = 1:nAssetsImage1
+                assetsImage1 = [assetsImage1; assets(iAsset,:)];
+                assetTypesImage1 = [assetTypesImage1; assetType];
             end
             
-            assets = findAssetsInImage(asset_data_table, image2, 7, 40, 30, 'Year2', camera_params);
-            num_assets_image2 = size(assets,1);
-            for asset_num = 1:num_assets_image2
-                assets_in_image2 = [assets_in_image2; assets(asset_num,:)];
-                asset_types_in_image2 = [asset_types_in_image2; asset_type];
+            assets = findAssetsInImage(assetDataTable,image2,MIN_X,MAX_X,MAX_Y,'Year2',cameraParams);
+            nAssetsImage2 = size(assets,1);
+            for iAsset = 1:nAssetsImage2
+                assetsImage2 = [assetsImage2; assets(iAsset,:)];
+                assetTypesImage2 = [assetTypesImage2; assetType];
             end
         end
     end
-    
 end
 
 
