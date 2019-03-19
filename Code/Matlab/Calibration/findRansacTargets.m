@@ -27,7 +27,7 @@ function findRansacTargets(data_points,theta,system_params,inlierIdxs)
        data_point = data_points(i,:);     
        plot(data_point.u, data_point.v, 'k+')
        
-      [u,v] = getPixelsFromCoords(data_point.x,data_point.y,data_point.z,params);
+      [u,v] = getPixelsFromCoords([data_point.x,data_point.y,data_point.z]',params);
       if inlierIdxs(i) == 0
         plot(u,v,'ro');
       else

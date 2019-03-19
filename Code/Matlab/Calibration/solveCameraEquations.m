@@ -12,14 +12,17 @@ system_params = [cx, cy, m, n];
 
 % loading data
 close all
-file_dir = fullfile(dataDir(),road,year,'target_data_road_height_01_03.csv');
-data_points_1 = readtable(file_dir);
+file_dir = fullfile(dataDir(),road,year,'target_data_road_height_12_03.csv');
+data_points_table1 = readtable(file_dir);
 
 file_dir = fullfile(dataDir(),road,year,'target_data_road_height_06_03.csv');
-data_points_2 = readtable(file_dir);
+data_points_table2 = readtable(file_dir);
 
-data_points = [data_points_1; data_points_2];
-%data_points = data_points(data_points.x<20,:)
+file_dir = fullfile(dataDir(),road,year,'target_data_road_height_01_03.csv');
+data_points_table3 = readtable(file_dir);
+
+data_points = [data_points_table1; data_points_table2; data_points_table3];
+%data_points = data_points_table2
 
 u = data_points.u;
 v = data_points.v;
@@ -31,15 +34,15 @@ coords = [x,y,z,u,v];
 
 % objective function and initial estimate
 f = @(theta) cameraEquationFunction(theta,coords,system_params);
-theta_0 = [0,0,0,1,1,3,2,0];
+theta_0 = [0,0,0,1,1,3,2,0,0,0];
 
 %% solving 
-ub = [ 0.2,  0.2,  0.2,  3,    3,    5, 3,  0.5];
-lb = [-0.2, -0.2, -0.2,  0.1,  0.1,  1, 0, -0.5];
+ub = [ 0.2,  0.2,  0.2,  3,    3,    5, 3,  0.5,0,1];
+lb = [-0.2, -0.2, -0.2,  0.1,  0.1,  1, 0, -0.5,0,1];
 disp('Running Global search')
 problem = createOptimProblem('fmincon','objective',f,'x0',theta_0,'lb',lb,'ub',ub);
 ms = MultiStart;
-[xg,fg,flg,og] = run(ms,problem,5);
+[xg,fg,flg,og] = run(ms,problem,20);
 
 theta_solve = xg;
 fval = fg;
@@ -65,7 +68,7 @@ if show_results
 end
 
 %% saving
-save = false;
+save = true;
 if save
    roll = Alpha; tilt = Beta; pan = Gamma;
    calibration_parameters = table(roll,tilt,pan,L1,L2,x0,y0,h,cx,cy,m,n);
