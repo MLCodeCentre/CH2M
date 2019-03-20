@@ -120,4 +120,3 @@ function theta_solve = solveCameraEquation(data_points,system_params)
     fval = fg;
 
 end
-
