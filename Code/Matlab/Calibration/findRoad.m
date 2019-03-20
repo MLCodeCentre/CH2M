@@ -26,16 +26,12 @@ pan = image_nav.HEADING;
 tilt = image_nav.PITCH;
 roll = image_nav.ROLL;
 
-LPc = toCameraCoords(LPw,pan,0,0);
-RBPc = toCameraCoords(RBPw,pan,0,0);
-RTPc = toCameraCoords(RTPw,pan,0,0);
-% 
-% LPc = toCameraCoords(LPw,pan,tilt,roll);
-% RBPc = toCameraCoords(RBPw,pan,tilt,roll);
-% RTPc = toCameraCoords(RTPw,pan,tilt,roll);
-
-y_range = linspace(LPc(1),RBPc(1),5);
-x_range = linspace(RBPc(2),RTPc(2),10);
+LPc = toVehicleCoords(LPw,pan,0,0);
+RBPc = toVehicleCoords(RBPw,pan,0,0);
+RTPc = toVehicleCoords(RTPw,pan,0,0);
+%
+x_range = linspace(RBPc(1),RTPc(1),10);
+y_range = linspace(LPc(2),RBPc(2),5);
 
 I = imread(img_file);
 imshow(I);
@@ -48,6 +44,9 @@ params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
 params.L1 = theta(4); params.L2 = theta(5);
 params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
 
+params.k1 = theta(9); params.k2 = theta(10);
+params.p1 = theta(11); params.p2 = theta(12);
+
 params.cx = system_params(1); params.cy = system_params(2); 
 params.m = system_params(3); params.n = system_params(4);
 
@@ -58,7 +57,7 @@ V = [];
 z = 0.6;
 for x = 5:15
     for y = -4        
-        [u,v] = getPixelsFromCoords(x,y,z,params);
+        [u,v] = getPixelsFromCoords([x,y,z]',params);
         U = [U,u];
         V = [V,v];
     end
@@ -78,7 +77,7 @@ Y = y_range;
 
 for y = Y
     for x = X
-        [u,v] = getPixelsFromCoords(x,y,z,params);
+        [u,v] = getPixelsFromCoords([x,y,z]',params);
         U = [U,u];
         V = [V,v];
     end
@@ -93,7 +92,7 @@ V = [];
 
 for x = X
     for y = Y
-        [u,v] = getPixelsFromCoords(x,y,z,params);
+        [u,v] = getPixelsFromCoords([x,y,z]',params);
         U = [U,u];
         V = [V,v];
     end
