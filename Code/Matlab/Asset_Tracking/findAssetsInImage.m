@@ -1,4 +1,4 @@
-function assets = findAssetsInImage(assets,image,cameraParams)
+function [assets, pVehicles, assetInfo] = findAssetsInImage(assets,image,cameraParams)
 % findAssetsInImage Find all assets in the table "assets" that are the in the image.
 %
 %   INPUTS:
@@ -56,12 +56,14 @@ if size(pVehicles,1) > 0
     pVehicles = pVehicles(correctX,:);
     boxes = boxes(correctX,:);
     pixels = pixels(correctX,:);
+    nearbyAssets = nearbyAssets(correctX,:);
 
     % getting assets with y less than MAX_Y
     correctY = abs(pVehicles(:,2)) < MAX_Y;
     pVehicles = pVehicles(correctY,:);
     boxes = boxes(correctY,:);
     pixels = pixels(correctY,:);
+    nearbyAssets = nearbyAssets(correctY,:);
 
     % are pixels in picture plus a buffer
     correctPixels = pixels(:,1) < cameraParams.m - BUFFER & pixels(:,1) > BUFFER ...
@@ -69,6 +71,9 @@ if size(pVehicles,1) > 0
     pVehicles = pVehicles(correctPixels,:);
     boxes = boxes(correctPixels,:);
     pixels = pixels(correctPixels,:);
+    nearbyAssets = nearbyAssets(correctPixels,:);
 end
 % return pixels and bounding boxes of assets
 assets = [pixels,boxes];
+% return info about assets.
+assetInfo = nearbyAssets;
