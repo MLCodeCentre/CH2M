@@ -1,6 +1,6 @@
 
 Lengths = 1:8;
-itters = 100;
+itters = 50;
 
 nLocations = zeros(itters,length(Lengths));
 

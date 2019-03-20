@@ -15,6 +15,13 @@ targetSequence = reshape(targetSequence,1,[]);
 sequences = createSequenceVectors(assetList,sequenceLength);
 
 % calculate hamming distance between all vectors.
-hammingDist = pdist2(targetSequence,sequences,'hamming');
-maxLocations = sum(hammingDist == min(hammingDist));
+%hammingDist = pdist2(targetSequence,sequences,'hamming');
+%maxLocations = sum(hammingDist == min(hammingDist));
 %plot(hammingDist)
+nSequences = size(sequences,1);
+for iSequence = 1:nSequences
+   editDist(iSequence) = edr(targetSequence,sequences(iSequence,:),0.1);  
+end
+
+%plot(editDist)
+maxLocations = sum(editDist == min(editDist));
