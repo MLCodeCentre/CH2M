@@ -20,6 +20,10 @@ configYear1.L2 = paramsTable1.L2;
 configYear1.h =  paramsTable1.h;
 configYear1.x0 = paramsTable1.x0;
 configYear1.y0 = paramsTable1.y0;
+configYear1.k1 = paramsTable1.k1;
+configYear1.k2 = paramsTable1.k2;
+configYear1.p1 = paramsTable1.p1;
+configYear1.p2 = paramsTable1.p2;
 
 configYear1.m = paramsTable1.m; configYear1.cx = paramsTable1.cx; % >
 configYear1.n = paramsTable1.n; configYear1.cy = paramsTable1.cy; % ^
@@ -33,6 +37,10 @@ configYear2.L2 = paramsTable2.L2;
 configYear2.h =  paramsTable2.h;
 configYear2.x0 = paramsTable2.x0;
 configYear2.y0 = paramsTable2.y0;
+configYear2.k1 = paramsTable2.k1;
+configYear2.k2 = paramsTable2.k2;
+configYear2.p1 = paramsTable2.p1;
+configYear2.p2 = paramsTable2.p2;
 
 configYear2.m = paramsTable2.m; configYear2.cx = paramsTable2.cx; % >
 configYear2.n = paramsTable2.n; configYear2.cy = paramsTable2.cy; % ^

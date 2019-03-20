@@ -25,10 +25,10 @@ for iAsset = 1:nAssets
     [assetDimensions(iAsset,:),assetZ(iAsset,1)] = getAssetDimensions(asset); 
     % asset and camera position in the world
     pAssetWorld = [asset.XCOORD,asset.YCOORD,assetZ(iAsset,1)]';
-    pVehicleWorld = [image.Northing,image.Easting,0]';
+    pVehicleWorld = [image.XCOORD,image.YCOORD,0]';
     pWorld = pAssetWorld-pVehicleWorld; % relative position in the world
     % converting to the vehicle frame of reference
-    pan = image.Heading;
+    pan = image.HEADING;
     %tilt = image.Tilt; roll = image.Roll;
     pVehicle = toVehicleCoords(pWorld,pan,0,0);
     assetPosition(iAsset,:) = [pVehicle(1), pVehicle(2), assetZ(iAsset,1)];

@@ -5,7 +5,7 @@ function roadDataCollection(road,year,camera,PCDATE,PCTIMES)
 % to the car heading are calculated and pixels collected from the click
 
 % target data with height info
-target_table = readtable(fullfile(dataDir(),road,'Targets','Targets_12_03_second.csv'));
+target_table = readtable(fullfile(dataDir(),road,'Targets','targets in the plane.csv'));
 targets = table2array(target_table);
 %targets(7,:) = []
 targets = targets(:,2:end)';
@@ -38,7 +38,7 @@ for ind = 1:num_files
     %Pw - position in (N,E,Z)
     Pw = bsxfun(@minus,targets,photo);
     %Pc - position in camera coords
-    Pc = toCameraCoords(Pw,pan,0,0);
+    Pc = toVehicleCoords(Pw,pan,0,0);
     %Pc = toCameraCoords(Pw,pan,tilt,roll);    
        
     %% getting U,V from click info
@@ -54,10 +54,10 @@ for ind = 1:num_files
 
 end
 
-file_name = 'target_data_road_height_12_03_second.csv';
+file_name = 'target_data_in_the_plane.csv';
 fprintf('saving table to %s\n', file_name);
 file_dir = fullfile(dataDir(),road,year,file_name);
-data_point_table = array2table(data_points, 'VariableNames', {'y','x','z','u','v'});
+data_point_table = array2table(data_points, 'VariableNames', {'x','y','z','u','v'});
 file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
 table = [file_name_table, data_point_table];
 writetable(table,file_dir)

@@ -27,13 +27,22 @@ T = [x0, y0, h]';
 Xw = coordinates; % X in the world
 Xc = R*Xw - T; % X relative to the camera
 
+% radial distortion
+k1 = cameraParams.k1; k2 = cameraParams.k2;
+r = sqrt(Xc(2)^2 + Xc(3)^2);
+radialDistortionY = Xc(2)*(1 + k1*(r^2) + k2*(r^4));
+radialDistortionZ = Xc(3)*(1 + k1*(r^2) + k2*(r^4));
+% tangential distortion
+p1 = cameraParams.p1; p2 = cameraParams.p2;
+tangentialDistortionY = 2*p1*Xc(2)*Xc(3) + p2*(r^2 + 2*(Xc(2)^2));
+tangentialDistortionZ = 2*p2*Xc(2)*Xc(3) + p1*(r^2 + 2*(Xc(3)^2));
+
+Xc(2) = radialDistortionY + tangentialDistortionY;
+Xc(3) = radialDistortionZ + tangentialDistortionZ;
+
+% converting to pixels
 u_dash = m*L1*Xc(2)/Xc(1); % this is from the centre of the image
 v_dash = n*L2*Xc(3)/Xc(1);
 
-% radial distortion.
-% r = sqrt(u_dash^2 + v_dash^2);
-% u_dash = u_dash*(1 + k1*(r^2) + k2*(r^4));
-% v_dash = v_dash*(1 + k1*(r^2) + k2*(r^4));
-     
 u = u_dash + cx; % transforming coordinate system to top left
 v = -v_dash + cy;

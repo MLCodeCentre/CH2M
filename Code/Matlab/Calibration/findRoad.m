@@ -45,6 +45,7 @@ params.L1 = theta(4); params.L2 = theta(5);
 params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
 
 params.k1 = theta(9); params.k2 = theta(10);
+params.p1 = theta(11); params.p2 = theta(12);
 
 params.cx = system_params(1); params.cy = system_params(2); 
 params.m = system_params(3); params.n = system_params(4);

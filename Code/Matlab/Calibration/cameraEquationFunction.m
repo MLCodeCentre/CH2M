@@ -8,6 +8,9 @@ params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
 
 %radial 
 params.k1 = theta(9); params.k2 = theta(10);
+% tangential
+params.p1 = theta(11); params.p2 = theta(12);
+
 % constants
 params.cx = system_params(1); params.cy = system_params(2);
 params.m = system_params(3); params.n = system_params(4);

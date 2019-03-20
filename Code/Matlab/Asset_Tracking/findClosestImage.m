@@ -101,13 +101,13 @@ fileName = char(strcat([num2str(num2str(camera)),...
 % if a closest image exists
 if size(pCameraClosest) > 0
     % define heading northing and easting and angles
-    Heading = navFile.HEADING;
-    Northing = navFile.XCOORD;
-    Easting = navFile.YCOORD;
-    Tilt = navFile.PITCH;
-    Roll = navFile.ROLL;
-    image = table({fileName},Easting,Northing,Heading,Tilt,Roll,pCameraClosest(1),pCameraClosest(2),pCameraClosest(3),...
-                    'VariableNames',{'fileName','Easting','Northing','Heading','Tilt','Roll','assetX','assetY','assetZ'});
+    HEADING = navFile.HEADING;
+    XCOORD = navFile.XCOORD;
+    YCOORD = navFile.YCOORD;
+    PITCH = navFile.PITCH;
+    ROLL = navFile.ROLL;
+    image = table({fileName},XCOORD,YCOORD,HEADING,PITCH,ROLL,pCameraClosest(1),pCameraClosest(2),pCameraClosest(3),...
+                    'VariableNames',{'fileName','XCOORD','YCOORD','HEADING','PITCH','ROLL','assetX','assetY','assetZ'});
     targetPixels = pixelsClosest;
 else
     image = [];

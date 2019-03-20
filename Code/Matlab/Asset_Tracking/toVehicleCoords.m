@@ -17,4 +17,4 @@ RotRoad = rotz(pan)*roty(tilt)*rotx(roll);
 R = RotRoad*W;
 % This is a quick fix, the heading the angle from the Northing. The vector
 % is now [x,y,z] wiht x down the road, y across the road and z height.
-R = [R(2); R(1); R(3)];
+R = [R(2,:); R(1,:); R(3,:)];

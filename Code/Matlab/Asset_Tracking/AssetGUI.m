@@ -22,7 +22,7 @@ function varargout = AssetGUI(varargin)
 
 % Edit the above text to modify the response to help AssetGUI
 
-% Last Modified by GUIDE v2.5 15-Mar-2019 09:18:02
+% Last Modified by GUIDE v2.5 20-Mar-2019 10:43:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -244,6 +244,10 @@ try
     % load navFiles
     navFileYear1 = readtable(fullfile(dataDir,road,'Year1','Nav','Nav.csv'));
     navFileYear2 = readtable(fullfile(dataDir,road,'Year2','Nav','Nav.csv'));
+    % order nav files by PCDATE then PCTIME.
+    navFileYear1 = sortrows(navFileYear1,{'PCDATE','PCTIME'});
+    navFileYear2 = sortrows(navFileYear2,{'PCDATE','PCTIME'});
+    
     % create a struct so that the road has a nav file and the
     % camera parameters for each year.
     navData = struct('navFileYear1',navFileYear1,'navFileYear2',navFileYear2);
@@ -461,21 +465,25 @@ road = handles.setRoad.String{handles.setRoad.Value};
 assetTypes = handles.selectAssetType.String;
 cameraParams = handles.setRoad.UserData.cameraParams;
 
-% find all assets in year 1 image
-[assetsImage1,assetTypesImage1] = ...
-    findAllAssets(image1,assetTypes,dataDir,road,cameraParams('Year1'));
-% plot all of those assets
-axes(handles.axes1);
-set(handles.axes1,'NextPlot','add')
-plotAllAssets(assetsImage1,assetTypesImage1,false)
+% find all assets in year 1 image if loaded
+if isempty(image1) == 0
+    [assetsImage1,assetTypesImage1] = ...
+        findAllAssets(image1,assetTypes,dataDir,road,cameraParams('Year1'));
+    % plot all of those assets
+    axes(handles.axes1);
+    set(handles.axes1,'NextPlot','add')
+    plotAllAssets(assetsImage1,assetTypesImage1,false)
+end
 
-% find all asset in year 2 image
+% find all asset in year 2 image if loaded
+if isempty(image1) == 1
 [assetsImage2,assetTypesImage2] = ...
     findAllAssets(image2,assetTypes,dataDir,road,cameraParams('Year2'));
 % plot all of those assets
 axes(handles.axes2);
 set(handles.axes2,'NextPlot','add')
 plotAllAssets(assetsImage2,assetTypesImage2,false)
+end
 
 
 % --- Executes on button press in showAssets.
@@ -494,23 +502,27 @@ assetSearchType = getAssetSearchType(handles);
 cameraParams = handles.setRoad.UserData.cameraParams;
 assetData = handles.assetSearchTypeSelection.UserData;
 
-% find assets in image 1
-assetsImage1 = findAssetsInImage(assetData,image1,cameraParams('Year1'));
-% all assets are same type
-assetTypesImage1 = char(ones(size(assetsImage1,1),1) * assetSearchType);
-% plot with boxes
-axes(handles.axes1);
-set(handles.axes1,'NextPlot','add')
-plotAllAssets(assetsImage1,assetTypesImage1,true)
+% find assets in image 1 if an image is loaded
+if isempty(image1) == 0
+    assetsImage1 = findAssetsInImage(assetData,image1,cameraParams('Year1'));
+    % all assets are same type
+    assetTypesImage1 = char(ones(size(assetsImage1,1),1) * assetSearchType);
+    % plot with boxes
+    axes(handles.axes1);
+    set(handles.axes1,'NextPlot','add')
+    plotAllAssets(assetsImage1,assetTypesImage1,true)
+end
 
-% find asset in image 2
-assetsImage2 = findAssetsInImage(assetData,image2,cameraParams('Year2'));
-% all assets are same type
-assetTypesImage2 = char(ones(size(assetsImage2,1),1) * assetSearchType);
-% plot with boxes
-axes(handles.axes2);
-set(handles.axes2,'NextPlot','add')
-plotAllAssets(assetsImage2,assetTypesImage2,true)
+% find asset in image 2 if image is loaded
+if isempty(image2) == 0
+    assetsImage2 = findAssetsInImage(assetData,image2,cameraParams('Year2'));
+    % all assets are same type
+    assetTypesImage2 = char(ones(size(assetsImage2,1),1) * assetSearchType);
+    % plot with boxes
+    axes(handles.axes2);
+    set(handles.axes2,'NextPlot','add')
+    plotAllAssets(assetsImage2,assetTypesImage2,true)
+end
 
 
 % --- If Enable == 'on', executes on mouse press in 5 pixel border.
@@ -519,6 +531,111 @@ function loadNavData_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to loadnavdata (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in prevYear1.
+function prevYear1_Callback(hObject, eventdata, handles)
+% hObject    handle to prevYear1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+navFile = handles.setRoad.UserData.navData.navFileYear1;
+[camera,PCDATE,PCTIME] = parseImageFileName(handles.year1File.String);
+rowInd = find((navFile.PCDATE==PCDATE & navFile.PCTIME==PCTIME));
+prevImage = navFile(rowInd-1,:);
+prevImage.fileName{1} = constructFileName(camera,prevImage.PCDATE,prevImage.PCTIME);
+
+% load dataDir and road for the plot
+dataDir = handles.setDataDir.UserData;
+road = handles.setRoad.String{handles.setRoad.Value};
+plotAssetsOnAxes(prevImage,[],[],[],dataDir,road,'Year1',handles)
+
+
+% --- Executes on button press in nextYear1.
+function nextYear1_Callback(hObject, eventdata, handles)
+% hObject    handle to nextYear1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+navFile = handles.setRoad.UserData.navData.navFileYear1;
+[camera,PCDATE,PCTIME] = parseImageFileName(handles.year1File.String);
+rowInd = find((navFile.PCDATE==PCDATE & navFile.PCTIME==PCTIME));
+nextImage = navFile(rowInd+1,:);
+nextImage.fileName{1} = constructFileName(camera,nextImage.PCDATE,nextImage.PCTIME);
+
+% load dataDir and road for the plot
+dataDir = handles.setDataDir.UserData;
+road = handles.setRoad.String{handles.setRoad.Value};
+plotAssetsOnAxes(nextImage,[],[],[],dataDir,road,'Year1',handles)
+
+
+% --- Executes on button press in prevYear2.
+function prevYear2_Callback(hObject, eventdata, handles)
+% hObject    handle to prevYear2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+navFile = handles.setRoad.UserData.navData.navFileYear2;
+[camera,PCDATE,PCTIME] = parseImageFileName(handles.year2File.String);
+rowInd = find((navFile.PCDATE==PCDATE & navFile.PCTIME==PCTIME));
+prevImage = navFile(rowInd-1,:);
+
+prevImage.fileName{1} = constructFileName(camera,prevImage.PCDATE,prevImage.PCTIME);
+
+% load dataDir and road for the plot
+dataDir = handles.setDataDir.UserData;
+road = handles.setRoad.String{handles.setRoad.Value};
+plotAssetsOnAxes(prevImage,[],[],[],dataDir,road,'Year2',handles)
+
+
+% --- Executes on button press in nextYear2.
+function nextYear2_Callback(hObject, eventdata, handles)
+% hObject    handle to nextYear2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+navFile = handles.setRoad.UserData.navData.navFileYear2;
+[camera,PCDATE,PCTIME] = parseImageFileName(handles.year2File.String);
+rowInd = find((navFile.PCDATE==PCDATE & navFile.PCTIME==PCTIME));
+nextImage = navFile(rowInd+1,:);
+nextImage.fileName{1} = constructFileName(camera,nextImage.PCDATE,nextImage.PCTIME);
+
+% load dataDir and road for the plot
+dataDir = handles.setDataDir.UserData;
+road = handles.setRoad.String{handles.setRoad.Value};
+plotAssetsOnAxes(nextImage,[],[],[],dataDir,road,'Year2',handles)
+
+
+% --- Executes on button press in loadYear1.
+function loadYear1_Callback(hObject, eventdata, handles)
+% hObject    handle to loadYear1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% loading dataDir and road for folder search
+dataDir = handles.setDataDir.UserData;
+road = handles.setRoad.String{handles.setRoad.Value};
+imageFile = uigetfile(fullfile(dataDir,road,'Year1','Images','*.jpg'),'Select an image');
+% parse image information and find navFile entry
+[camera,PCDATE,PCTIME] = parseImageFileName(imageFile);
+navFile = handles.setRoad.UserData.navData.navFileYear1;
+image = navFile((navFile.PCDATE==PCDATE & navFile.PCTIME==PCTIME),:);
+% add the file name and plot on axis. 
+image.fileName{1} = imageFile;
+plotAssetsOnAxes(image,[],[],[],dataDir,road,'Year1',handles)
+
+
+% --- Executes on button press in loadYear2.
+function loadYear2_Callback(hObject, eventdata, handles)
+% hObject    handle to loadYear2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% loading dataDir and road for folder search
+dataDir = handles.setDataDir.UserData;
+road = handles.setRoad.String{handles.setRoad.Value};
+imageFile = uigetfile(fullfile(dataDir,road,'Year2','Images','*.jpg'),'Select an image');
+% parse image information and find navFile entry
+[camera,PCDATE,PCTIME] = parseImageFileName(imageFile);
+navFile = handles.setRoad.UserData.navData.navFileYear2;
+image = navFile((navFile.PCDATE==PCDATE & navFile.PCTIME==PCTIME),:);
+% add the file name and plot on axis. 
+image.fileName{1} = imageFile;
+plotAssetsOnAxes(image,[],[],[],dataDir,road,'Year2',handles)
 
 
 %-----------custom functions-----------%
@@ -600,11 +717,29 @@ else
         set(handles.year2File,'String',imgFile)
         set(handles.year2File,'UserData',image);
     end
-    % plot box and pixels
-    hold on
-    rectangle('Position',box,...
-        'LineWidth',1,'LineStyle','-','EdgeColor','r','Curvature',0);
-    plot(targetPixels(1),targetPixels(2),'g+')
-    text(targetPixels(1),targetPixels(2),assetType,'color','m')
-    hold off
+    % plot box and pixels if not empty
+    if isempty(box) == 0
+        hold on
+        rectangle('Position',box,...
+            'LineWidth',1,'LineStyle','-','EdgeColor','r','Curvature',0);
+        plot(targetPixels(1),targetPixels(2),'g+')
+        text(targetPixels(1),targetPixels(2),assetType,'color','m')
+        hold off
+    end
 end
+
+
+% parses image file name
+function [camera,PCDATE,PCTIME] = parseImageFileName(fileName)
+fileNameAndExt = strsplit(fileName,'.');
+fileName = fileNameAndExt{1};
+fileInfo = strsplit(fileName,'_');
+camera = str2num(fileInfo{1});
+PCDATE = str2num(fileInfo{2});
+PCTIME = str2num(fileInfo{3});
+
+
+% creates image file name from camera, PCDATE and PCTIME 
+function fileName = constructFileName(camera,PCDATE,PCTIME)
+fileName = sprintf('%d_%d_%d.jpg',camera,PCDATE,PCTIME);
+

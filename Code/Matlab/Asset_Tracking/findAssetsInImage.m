@@ -10,14 +10,14 @@ function assets = findAssetsInImage(assets,image,cameraParams)
 %       pCameras: The position vector of the assets relative to the camera [(nAssets,3) ARRAY]
 
 % only consider images this far away from the asset
-MIN_X = 7;
+MIN_X = 5;
 MAX_X = 50;
 MAX_Y = 40;
 BUFFER = 50; % Assets must be this many pixels within the image
 
 % Initial filter to get only assets near to the photo
 assetLocation = [assets.XCOORD,assets.YCOORD,zeros(size(assets.YCOORD))];
-imageLocation = [image.Northing,image.Easting,0];
+imageLocation = [image.XCOORD,image.YCOORD,0];
 
 assetRelativeLocation = bsxfun(@minus,assetLocation,imageLocation);
 assetDistance = sqrt((assetRelativeLocation(:,1).^2 + assetRelativeLocation(:,2).^2));
@@ -36,10 +36,10 @@ for iAsset = 1:numAssets
     
     % asset and vehicle position in the world
     pAssetWorld = [asset.XCOORD,asset.YCOORD,assetZ]';
-    pVehicleWorld = [image.Northing,image.Easting,0]';
+    pVehicleWorld = [image.XCOORD,image.YCOORD,0]';
     pWorld = pAssetWorld-pVehicleWorld; % relative position in the world
     % converting the vehicle frame of reference
-    pan = image.Heading;
+    pan = image.HEADING;
     pVehicle = toVehicleCoords(pWorld,pan,0,0);
     % get bounding box and pixels
     box = getBoundingBox(pVehicle,assetDimensions,cameraParams);
