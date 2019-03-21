@@ -3,10 +3,12 @@ function F = cameraEquationFunction(theta,coords,system_params)
 % joining parameters that are learnt and known to pass to
 % getPixelsFromCoords
 % to be found
+% extrinsics
 params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
-params.L1 = theta(4); params.L2 = theta(5);
-params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
+params.h = theta(4); params.x0 = theta(5); params.y0 = theta(6);
 
+% intrinsics
+params.fy = theta(7); params.fz = theta(8);
 %radial 
 params.k1 = theta(9); params.k2 = theta(10);
 % tangential

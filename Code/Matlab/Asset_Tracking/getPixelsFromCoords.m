@@ -11,8 +11,12 @@ function [u,v] = getPixelsFromCoords(coordinates,cameraParams)
 A = cameraParams.alpha; B = cameraParams.beta; G = cameraParams.gamma;
 h = cameraParams.h; x0 = cameraParams.x0; y0 = cameraParams.y0;
 
-% instrinsics
-L1 = cameraParams.L1; L2 = cameraParams.L2;
+% intrinsics
+fy = cameraParams.fy; fz = cameraParams.fz;
+%radial 
+k1 = cameraParams.k1; k2 = cameraParams.k2;
+% tangential
+p1 = cameraParams.p1; p2 = cameraParams.p2;
 
 m = cameraParams.m; n = cameraParams.n;
 cx = cameraParams.cx; cy = cameraParams.cy;
@@ -28,12 +32,10 @@ Xw = coordinates; % X in the world
 Xc = R*Xw - T; % X relative to the camera
 
 % radial distortion
-k1 = cameraParams.k1; k2 = cameraParams.k2;
 r = sqrt(Xc(2)^2 + Xc(3)^2);
 radialDistortionY = Xc(2)*(1 + k1*(r^2) + k2*(r^4));
 radialDistortionZ = Xc(3)*(1 + k1*(r^2) + k2*(r^4));
 % tangential distortion
-p1 = cameraParams.p1; p2 = cameraParams.p2;
 tangentialDistortionY = 2*p1*Xc(2)*Xc(3) + p2*(r^2 + 2*(Xc(2)^2));
 tangentialDistortionZ = 2*p2*Xc(2)*Xc(3) + p1*(r^2 + 2*(Xc(3)^2));
 
@@ -41,8 +43,8 @@ Xc(2) = radialDistortionY + tangentialDistortionY;
 Xc(3) = radialDistortionZ + tangentialDistortionZ;
 
 % converting to pixels
-u_dash = m*L1*Xc(2)/Xc(1); % this is from the centre of the image
-v_dash = n*L2*Xc(3)/Xc(1);
+u_dash = fy*Xc(2)/Xc(1); % this is from the centre of the image
+v_dash = fz*Xc(3)/Xc(1);
 
 u = u_dash + cx; % transforming coordinate system to top left
 v = -v_dash + cy;

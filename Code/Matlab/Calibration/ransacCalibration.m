@@ -30,7 +30,7 @@ data_points = table2array(data_points(:,2:end));
 fitThetaFnc = @(data_points) solveCameraEquation(data_points,system_params);
 distFcn = @(theta,data_points) comparePixels(theta,data_points,system_params);
 % running ransac
-[theta_solve, inlierIdx] = ransac(data_points,fitThetaFnc,distFcn,8,30);
+[theta_solve, inlierIdx] = ransac(data_points,fitThetaFnc,distFcn,13,35);
 inlierIdx
 %% results
 findRoad(theta_solve,system_params,road,year);
@@ -38,25 +38,29 @@ figure
 findRansacTargets(data_points_table,theta_solve,system_params,inlierIdx);
 
 Alpha = theta_solve(1); Beta = theta_solve(2); Gamma = theta_solve(3);
-L1 = theta_solve(4); L2 = theta_solve(5); 
+sy = theta_solve(4); sz = theta_solve(5);
 h = theta_solve(6); x0 = theta_solve(7); y0 = theta_solve(8);
 k1 = theta_solve(9); k2 = theta_solve(10); 
 p1 = theta_solve(11); p2 = theta_solve(12); 
+lambda = theta_solve(13);
 
 %fprintf('Solved with residual %f parameter values: \n',fval);
 fprintf('--------Extrinsic Parameters---------\n')
 fprintf(' alpha (roll) : %2.4f degs \n beta (tilt) : %2.4f degs \n gamma (pan) : %2.4f degs\n', rad2deg(Alpha), rad2deg(Beta), rad2deg(Gamma));
 fprintf(' x0 : %2.4f m  \n y0 : %2.4f m  \n h : %2.4f m \n', x0, y0, h)
 fprintf('--------Intrinsic Parameters---------\n')
-fprintf(' L1 : %2.4f \n', L1);
-fprintf(' L2 : %2.4f \n', L2);
+%fprintf(' L1 : %2.4f \n', L1);
+%fprintf(' L2 : %2.4f \n', L2);
+fprintf(' sy : %2.4f \n', sy);
+fprintf(' sz : %2.4f \n', sz);
+fprintf(' lambda : %2.4f \n', lambda);
 fprintf(' k1 : %2.8f \n', k1);
 fprintf(' k2 : %2.8f \n', k2);
 fprintf(' p1 : %2.8f \n', p1);
 fprintf(' p2 : %2.8f \n', p2);
 
 %% saving
-save = true;
+save = false;
 if save
    roll = Alpha; tilt = Beta; pan = Gamma;
    calibration_parameters = table(roll,tilt,pan,L1,L2,x0,y0,h,cx,cy,m,n,k1,k2,p1,p2);
@@ -68,11 +72,13 @@ end
 end
 
 function distances = comparePixels(theta,data_points,system_params)
+    
     params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
-    params.L1 = theta(4); params.L2 = theta(5);
+    params.sy = theta(4); params.sz = theta(5);
     params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
-    params.k1 = theta(9); params.k2 = theta(10);
-    params.p1 = theta(11); params.p2 = theta(12);
+    params.k1 = theta(9); params.k2 = theta(10); 
+    params.p1 = theta(11); params.p2 = theta(12); 
+    params.lambda = theta(13);
 
 
     params.cx = system_params(1); params.cy = system_params(2); 
@@ -103,14 +109,14 @@ function theta_solve = solveCameraEquation(data_points,system_params)
 
     % objective function and initial estimate
     f = @(theta) cameraEquationFunction(theta,coords,system_params);
-    theta_0 = [0,0,0,1,1,3,2,0];    
-    theta_0 = [theta_0,0,0,0,0]; % distortion
+    theta_0 = [0,0,0,1,1,3,2,0];
+    theta_0 = [theta_0,0,0,0,0,0,0.005]; % distortion
 
-    % solving
+    %% solving 
     ub = [ 0.2,  0.2,  0.2,  3,    3,    5, 3,  0.5];
-    ub = [ub, 0.5, 0.5, 0.5, 0.5]; % distortion
+    ub = [ub, 0.5, 0.5, 0.5, 0.5, 800]; % distortion
     lb = [-0.2, -0.2, -0.2,  0.1,  0.1,  1, 0, -0.5];
-    lb = [lb, -0.5, -0.5, -0.5, -0.5]; % distortion
+    lb = [lb, -0.5, -0.5, -0.5, -0.5, 0]; % distortion
     disp('Running Global search')
     problem = createOptimProblem('fmincon','objective',f,'x0',theta_0,'lb',lb,'ub',ub);
     ms = MultiStart;

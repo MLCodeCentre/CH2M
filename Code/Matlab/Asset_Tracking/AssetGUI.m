@@ -476,7 +476,7 @@ if isempty(image1) == 0
 end
 
 % find all asset in year 2 image if loaded
-if isempty(image1) == 1
+if isempty(image1) == 0
 [assetsImage2,assetTypesImage2] = ...
     findAllAssets(image2,assetTypes,dataDir,road,cameraParams('Year2'));
 % plot all of those assets

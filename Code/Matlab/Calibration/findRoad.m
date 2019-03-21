@@ -40,11 +40,15 @@ hold on
 params = config();
 
 %cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
+% extrinsics
 params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
-params.L1 = theta(4); params.L2 = theta(5);
-params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
+params.h = theta(4); params.x0 = theta(5); params.y0 = theta(6);
 
+% intrinsics
+params.fy = theta(7); params.fz = theta(8);
+%radial 
 params.k1 = theta(9); params.k2 = theta(10);
+% tangential
 params.p1 = theta(11); params.p2 = theta(12);
 
 params.cx = system_params(1); params.cy = system_params(2); 
@@ -83,7 +87,7 @@ for y = Y
     end
     plot(U(:),V(:),'r')
     hold on
-    U = [];;
+    U = [];
     V = [];
 end
 
