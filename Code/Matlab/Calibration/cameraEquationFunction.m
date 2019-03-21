@@ -1,3 +1,4 @@
+
 function F = cameraEquationFunction(theta,coords,system_params)
 % joining parameters that are learnt and known to pass to
 % getPixelsFromCoords

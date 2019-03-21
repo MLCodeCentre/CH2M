@@ -61,4 +61,3 @@ data_point_table = array2table(data_points, 'VariableNames', {'x','y','z','u','v
 file_name_table = cell2table(file_names', 'VariableNames', {'image_file'});
 table = [file_name_table, data_point_table];
 writetable(table,file_dir)
-

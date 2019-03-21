@@ -86,4 +86,3 @@ if save
    writetable(calibration_parameters,out_file,'QuoteStrings',true); 
    disp('saved camera parameters')
 end
-

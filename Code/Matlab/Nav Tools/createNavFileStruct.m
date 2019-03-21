@@ -12,4 +12,3 @@ for iYear = 1:nYears
 end
 
 navFileStruct = containers.Map(years, vals);
-
