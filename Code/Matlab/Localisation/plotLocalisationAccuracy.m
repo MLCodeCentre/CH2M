@@ -1,15 +1,18 @@
+close all
 
-Lengths = 1:8;
-itters = 50;
+Lengths = 1:5;
+itters = 200;
 
-nLocations = zeros(itters,length(Lengths));
+localised = zeros(itters,length(Lengths));
 
 for Length = Lengths
+    Length
    for i = 1:itters
-       nLocations(i,Length) = localise(Length);
+       localised(i,Length) = localise(Length,0);
    end
 end
     
-boxplot(nLocations)
-ylabel('Number of optimal sequences')
-xlabel('Sign post sequence length')
+bar(Lengths,mean(localised))
+ylabel('Localisation Accuracy')
+xlabel('n')
+%xlim([0.5,5.5])

@@ -1,12 +1,14 @@
 function findRansacTargets(data_points,theta,system_params,inlierIdxs)
     
     params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
-    params.sy = theta(4); params.sz = theta(5);
-    params.h = theta(6); params.x0 = theta(7); params.y0 = theta(8);
-    params.lambda = theta(13);
-
+    params.h = theta(4); params.x0 = theta(5); params.y0 = theta(6);
+    
+    params.fu = theta(7); params.fv = theta(8);
+    
     params.k1 = theta(9); params.k2 = theta(10);
     params.p1 = theta(11); params.p2 = theta(12);
+    params.cu = theta(13); params.cv = theta(14);
+    params.s = theta(15);
     
     params.cx = system_params(1); params.cy = system_params(2); 
     params.m = system_params(3); params.n = system_params(4);

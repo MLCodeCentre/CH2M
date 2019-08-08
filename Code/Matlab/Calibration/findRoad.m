@@ -1,4 +1,4 @@
-function findRoad(theta,system_params,road,year)
+function findRoad(theta,systemParams,road,year)
 %close all;
 figure  
 
@@ -7,7 +7,7 @@ if strcmp(year,'Year1')
 elseif strcmp(year,'Year2')
     img_file = fullfile(dataDir(),road,year,'Images','2_2367_1174.jpg');
 elseif strcmp(year,'Year3')
-    img_file = fullfile(dataDir(),road,year,'Images','2_559_896.jpg');
+    img_file = fullfile(dataDir(),road,year,'Images','2_559_895.jpg');
 end
 
 image_nav = getNavFromFile(img_file,road,year);
@@ -29,38 +29,40 @@ roll = image_nav.ROLL;
 LPc = toVehicleCoords(LPw,pan,0,0);
 RBPc = toVehicleCoords(RBPw,pan,0,0);
 RTPc = toVehicleCoords(RTPw,pan,0,0);
+
+% LPc = toVehicleCoords(LPw,pan,0,roll);
+% RBPc = toVehicleCoords(RBPw,pan,0,roll);
+% RTPc = toVehicleCoords(RTPw,pan,0,roll);
 %
-x_range = linspace(RBPc(1),RTPc(1),10);
-y_range = linspace(LPc(2),RBPc(2),5);
+xRange = linspace(RBPc(1),RTPc(1),10);
+yRange = linspace(LPc(2),RBPc(2),5);
 
 I = imread(img_file);
 imshow(I);
 hold on
 
-params = config();
+if isstruct(theta)
+    params = theta;
+else
+    %cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
+    % extrinsics
+    params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
+    params.x0 = theta(4); params.y0 = theta(5); params.h = theta(6);
 
-%cx = system_params(1); cy = system_params(2); m = system_params(3); n = system_params(4);
-% extrinsics
-params.alpha = theta(1); params.beta = theta(2); params.gamma = theta(3);
-params.h = theta(4); params.x0 = theta(5); params.y0 = theta(6);
-
-% intrinsics
-params.fy = theta(7); params.fz = theta(8);
-%radial 
-params.k1 = theta(9); params.k2 = theta(10);
-% tangential
-params.p1 = theta(11); params.p2 = theta(12);
-
-params.cx = system_params(1); params.cy = system_params(2); 
-params.m = system_params(3); params.n = system_params(4);
-
+    % intrinsics
+    params.fu = theta(7); params.fv = theta(7);
+%     params.cu = theta(9); params.cv = theta(10);
+%     params.k1 = theta(11); params.p1 = theta(12);
+    %radial 
+     params.m = systemParams(1); params.n = systemParams(2);
+end
 
 %% some coords
 U = [];
 V = [];
-z = 0.6;
-for x = 5:15
-    for y = -4        
+z = 0;
+for x = linspace(10,40,10)
+    for y = linspace(-1.8,1.8,10)        
         [u,v] = getPixelsFromCoords([x,y,z]',params);
         U = [U,u];
         V = [V,v];
@@ -76,8 +78,8 @@ U = [];
 V = [];
 z = 0;
 
-X = x_range;
-Y = y_range;
+X = xRange;
+Y = yRange;
 
 for y = Y
     for x = X

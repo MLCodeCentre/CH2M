@@ -2,101 +2,112 @@ function solveCameraEquations(road,year)
 
 % Initialising system parameters and data
 if strcmp(year,'Year1')
-    cx = 1280; cy = 1024; m = 2560; n = 2048;
+    m = 2560; n = 2048;
+    vanishingPoint = [1237,1004];
 elseif strcmp(year,'Year2')
-    cx = 1280; cy = 1024; m = 2560; n = 2048;
+    m = 2560; n = 2048;
+    vanishingPoint = [1282,812]; 
 elseif strcmp(year,'Year3')
-    cy = 1;
+    m = 2464; n = 2056;
 end
-system_params = [cx, cy, m, n];
+systemParams = [m,n];
+%vanishingPoint = [1156,910];
 
 % loading data
 close all
-file_dir = fullfile(dataDir(),road,year,'target_data_road_height_12_03.csv');
-data_points_table1 = readtable(file_dir);
+fileDir = fullfile(dataDir(),road,year,'target_data_road_height_12_03.csv');
+dataTable1 = readtable(fileDir);
+fileDir = fullfile(dataDir(),road,year,'target_data_road_height_06_03.csv');
+dataTable2 = readtable(fileDir);
+fileDir = fullfile(dataDir(),road,year,'target_data_road_height_01_03.csv');
+dataTable3 = readtable(fileDir);
+%data = [dataTable1;dataTable2;dataTable3];
+data = [dataTable2;dataTable3];
 
-file_dir = fullfile(dataDir(),road,year,'target_data_road_height_06_03.csv');
-data_points_table2 = readtable(file_dir);
+data.file = data.image_file;
 
-file_dir = fullfile(dataDir(),road,year,'target_data_road_height_01_03.csv');
-data_points_table3 = readtable(file_dir);
+% splitting into train and test sets
+split = 1; % percentage to train on. 
+nData = size(data,1);
+nTrain = ceil(nData*split);
+%shuffle data and split
+data = data(randperm(nData),:);
+dataTrain = data(1:nTrain,:);
+dataTest = data(nTrain+1:end,:);
 
-data_points = [data_points_table1; data_points_table2; data_points_table3];
-%data_points = data_points_table2
+%% Training (Calibrating)
+coords = [dataTrain.x,dataTrain.y,dataTrain.z,dataTrain.u,dataTrain.v];
 
-u = data_points.u;
-v = data_points.v;
-x = data_points.x;
-y = data_points.y;
-z = data_points.z;
+alphaInit = 0; alphaLB = -0.2; alphaUB = 0.2;
+betaInit = 0; betaLB = -0.2; betaUB = 0.2;
+gammaInit = 0; gammaLB = -0.2; gammaUB = 0.2;
+x0Init = 2; x0LB = 2; x0UB = 2;
+y0Init = 0; y0LB = 0; y0UB = 0;
+hInit = 3; hLB = 1; hUB = 4;
+fInit = 4000; fLB = 4000; fUB = 4000;
+% fInit = 1/4000; fLB = 0; fUB = 0.0005;
+% cuInit = 0; cuLB = -1000; cuUB = 1000;
+% cvInit = 0; cvLB = -1000; cvUB = 1000;
+% k1Int = 0; k1LB =  0; k1UB = 0;
+% p1Int = 0; p1LB =  0; p1UB = 0;
 
-coords = [x,y,z,u,v];
+% creating initial guess and bounds vectors
+% thetaInit = [alphaInit, betaInit, gammaInit, x0Init, y0Init, hInit, fInit, fInit, cuInit, cvInit, k1Int, p1Int];
+% thetaLB = [alphaLB, betaLB, gammaLB, x0LB, y0LB, hLB, fLB, fLB, cuLB, cvLB, k1LB, p1LB];
+% thetaUB = [alphaUB, betaUB, gammaUB, x0UB, y0UB, hUB, fUB, fUB, cuUB, cvUB, k1UB, p1UB];
+% SIMPLE
+thetaInit = [alphaInit, betaInit, gammaInit, x0Init, y0Init, hInit, fInit];
+thetaLB = [alphaLB, betaLB, gammaLB, x0LB, y0LB, hLB, fLB];
+thetaUB = [alphaUB, betaUB, gammaUB, x0UB, y0UB, hUB, fUB];
 
 % objective function and initial estimate
-f = @(theta) cameraEquationFunction(theta,coords,system_params);
-% extrinsics alpha beta gamma h x0 y0
-theta_0 = [0,0,0,3,2,0];
-% intrinscs = sy sz p1 p2 k1 k2
-theta_0 = [theta_0,...
-           100,100,0,0,0,0]; % distortion
-
-%% solving
-% ext
-ub = [0.2,0.2,0.2,5,3,0.5];
-% int
-ub = [ub, ...
-      2500,2500,0.5,0.5,0.5,0.5];
-% ext
-lb = [-0.2,-0.2,-0.2,0,-1,-0.5];
-% int
-lb = [lb, ...
-      0,0,-0.5,-0.5,-0.5,-0.5];
+f = @(theta) cameraEquationFunction(theta,coords,systemParams);
 
 disp('Running Global search')
-problem = createOptimProblem('fmincon','objective',f,'x0',theta_0,'lb',lb,'ub',ub);
+options = optimset('TolFun',1e-16,'TolX',1e-16);
+problem = createOptimProblem('fmincon','objective',f,'x0',thetaInit,'lb',thetaLB,'ub',thetaUB,'options',options);
 ms = MultiStart;
-[xg,fg,flg,og] = run(ms,problem,5);
+[xg,fg,flg,og] = run(ms,problem,10);
 
-theta_solve = xg;
+thetaSolve = xg;
 fval = fg;
-
 %% results
 show_results = true;
 if show_results
     % exts
-    alpha = theta_solve(1); beta = theta_solve(2); gamma = theta_solve(3);
-    h = theta_solve(4); x0 = theta_solve(5);  y0 = theta_solve(6); 
+    alpha = thetaSolve(1); beta = thetaSolve(2); gamma = thetaSolve(3);
+    x0 = thetaSolve(4); y0 = thetaSolve(5);  h = thetaSolve(6); 
     % ints
-    fy = theta_solve(7); fz = theta_solve(8);
-    k1 = theta_solve(9); k2 = theta_solve(10); 
-    p1 = theta_solve(11); p2 = theta_solve(12); 
+    fu = thetaSolve(7); fv = thetaSolve(7);
+%     cu = thetaSolve(9); cv = thetaSolve(10);
+%     k1 = thetaSolve(11); p1 = thetaSolve(12);
 
-
-    fprintf('Solved with residual %f parameter values: \n',fval);
+    fprintf('Solved with train error: %f pixels \n',fval);
     fprintf('--------Extrinsic Parameters---------\n')
     fprintf(' alpha (roll) : %2.4f degs \n beta (tilt) : %2.4f degs \n gamma (pan) : %2.4f degs\n', rad2deg(alpha), rad2deg(beta), rad2deg(gamma));
     fprintf(' h : %2.4f m  \n x0 : %2.4f m  \n y0 : %2.4f m \n', h, x0, y0)
     fprintf('--------Intrinsic Parameters---------\n')
-    %fprintf(' L1 : %2.4f \n', L1);
-    %fprintf(' L2 : %2.4f \n', L2);
-    fprintf(' fy : %2.4f \n', fy);
-    fprintf(' fz : %2.4f \n', fz);
-    fprintf(' k1 : %2.8f \n', k1);
-    fprintf(' k2 : %2.8f \n', k2);
-    fprintf(' p1 : %2.8f \n', p1);
-    fprintf(' p2 : %2.8f \n', p2);
-
-    findRoad(theta_solve,system_params,road,year);
-    figure
-    findTargets(data_points,theta_solve,system_params);
+    fprintf(' fu : %2.9f \n', fu);
+    fprintf(' fv : %2.9f \n', fv);
+%     fprintf(' cu : %2.2f \n', cu);
+%     fprintf(' cv : %2.2f \n', cv);
+%     fprintf(' k1 : %2.8f \n', k1);
+%     fprintf(' p1 : %2.8f \n', p1);
+%     
+    % find the road surface and the test point
+    %findRoad(thetaSolve,systemParams,road,year);
+    %figure
+    %findTargets(dataTrain,thetaSolve,systemParams); 
+    exploreError(coords,thetaSolve,systemParams)
 end
 
+
 %% saving
-save = true;
+save = false;
 if save
-   %roll = Alpha; tilt = Beta; pan = Gamma;
-   calibration_parameters = table(alpha,beta,gamma,h,x0,y0,h,cx,cy,m,n,fy,fz,k1,k2,p1,p2);
-   out_file = fullfile(dataDir(),road,year,'calibration_parameters.csv');
+%    roll = Alpha; tilt = Beta; pan = Gamma;
+   calibration_parameters = table(alpha,beta,gamma,x0,y0,h,m,n,fu,fv);
+   out_file = fullfile(dataDir(),road,year,'calibration_parameters_simple.csv');
    writetable(calibration_parameters,out_file,'QuoteStrings',true); 
    disp('saved camera parameters')
 end

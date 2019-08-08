@@ -23,9 +23,10 @@ File_Name = char(strcat([num2str(repmat(num2str(camera),[num_images,1])), ...
 
 Northing = nav_file.XCOORD;
 Easting = nav_file.YCOORD;
+PCDATE = nav_file.PCDATE;
 PCTIME = nav_file.PCTIME;
 
-images = table(File_Name, PCTIME, Year, Distance, Northing, Easting, Heading);
+images = table(File_Name, PCDATE, PCTIME, Year, Distance, Northing, Easting, Heading);
 
 end
 
