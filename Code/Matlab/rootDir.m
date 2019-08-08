@@ -1,2 +1,4 @@
 function path = rootDir()
- path = 'C:\Users\ts1454\CH2M';
+%ROOTDIR path to top level folder where code sits. 
+path = fullfile('O:','Jacobs','Code','Matlab');
+end

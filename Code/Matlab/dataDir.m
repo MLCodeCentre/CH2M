@@ -1,4 +1,7 @@
 function path = dataDir()
-path = 'C:/CH2MData';
- %path = 'E:';
- 
+%DATADIR specifies the path to the top level folder for survey data - one
+% level above "road".
+path = 'F:/';
+end
+
+
