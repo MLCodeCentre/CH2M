@@ -17,7 +17,7 @@ BUFFER = 50; % asset must be this many pixels away from image edge.
 % only consider images this far away from the asset
 MIN_X = 10;
 MAX_X = 50;
-MAX_Y = 10;
+MAX_Y = 20;
 
 % firstly only consider photos within a certain x distance away
 if iscell(asset.XCOORD) 
@@ -25,9 +25,7 @@ if iscell(asset.XCOORD)
     asset.YCOORD = str2num(cell2mat(asset.YCOORD));
 end
 distances = sqrt((navFile.XCOORD - asset.XCOORD).^2 + (navFile.YCOORD - asset.YCOORD).^2);
-navFile = navFile(distances < 50,...
-                   {'XCOORD','YCOORD','HEADING','PCDATE','PCTIME',...
-                   'PITCH','ROLL','YAW'});
+navFile = navFile(distances < 100,:);
             
 %% loop through images in nav files and get the position of asset in the frame of the camera, box and pixels of the asset with respect to each image
 nNavFiles = size(navFile,1);
@@ -67,17 +65,9 @@ boxes = boxes(correctY,:);
 pixels = pixels(correctY,:);
 navFile = navFile(correctY,:);
 
-% are pixels in the image (plus a buffer)
-correctPixels = pixels(:,1) < cameraParams.m - BUFFER & pixels(:,1) > BUFFER ...
-    & pixels(:,2) < cameraParams.n - BUFFER & pixels(:,2) > BUFFER;
-pVehicles = pVehicles(correctPixels,:);
-boxes = boxes(correctPixels,:);
-pixels = pixels(correctPixels,:);
-navFile = navFile(correctPixels,:);
-
 % are boxes in the image
-correctBoxes = boxes(:,1) > 0 & boxes(:,1) + boxes(:,3) < cameraParams.m ... 
-            & boxes(:,2) > 0 & boxes(:,2) + boxes(:,4) < cameraParams.n;
+correctBoxes = boxes(:,1) > BUFFER & boxes(:,1) + boxes(:,3) < cameraParams.m - BUFFER ... 
+            & boxes(:,2) > BUFFER & boxes(:,2) + boxes(:,4) < cameraParams.n - BUFFER;
 % if not, allow boxes that are no completely contained in the image
 if sum(correctBoxes) > 0
     navFile = navFile(correctBoxes,:);
@@ -85,6 +75,14 @@ if sum(correctBoxes) > 0
     boxes = boxes(correctBoxes,:);
     pixels = pixels(correctBoxes,:);
 end
+
+% are pixels in the image (plus a buffer)
+correctPixels = pixels(:,1) < cameraParams.m - BUFFER & pixels(:,1) > BUFFER ...
+    & pixels(:,2) < cameraParams.n - BUFFER & pixels(:,2) > BUFFER;
+pVehicles = pVehicles(correctPixels,:);
+boxes = boxes(correctPixels,:);
+pixels = pixels(correctPixels,:);
+navFile = navFile(correctPixels,:);
 
 %% find closest image
 distances = sqrt(pVehicles(:,1).^2 + pVehicles(:,2).^2 + pVehicles(:,3).^2);
@@ -105,13 +103,8 @@ fileName = char(strcat([num2str(num2str(camera)),...
 % if a closest image exists
 if size(pCameraClosest) > 0
     % define heading northing and easting and angles
-    HEADING = navFile.HEADING;
-    XCOORD = navFile.XCOORD;
-    YCOORD = navFile.YCOORD;
-    PITCH = navFile.PITCH;
-    ROLL = navFile.ROLL;
-    image = table({fileName},XCOORD,YCOORD,HEADING,PITCH,ROLL,pCameraClosest(1),pCameraClosest(2),pCameraClosest(3),...
-                    'VariableNames',{'fileName','XCOORD','YCOORD','HEADING','PITCH','ROLL','assetX','assetY','assetZ'});
+    image = navFile;
+    image.fileName = fileName;
     targetPixels = pixelsClosest;
 else
     image = [];

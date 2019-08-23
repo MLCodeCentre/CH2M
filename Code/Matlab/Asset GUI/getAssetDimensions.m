@@ -11,7 +11,7 @@ function [assetDimensions,assetZ] = getAssetDimensions(asset)
 MAX_HEIGHT = 7;
 fields  = asset.Properties.VariableNames;
 % default dimensions.
-assetWidth = 1;
+assetWidth = 0.3;
 assetHeight = 1;
 assetLength = 0;
 assetZ = 0;

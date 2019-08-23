@@ -7,7 +7,7 @@ data = table2array(data(:,{'x','y','z','u','v'}));
 % defining ransac fitting function and distance function
 fitThetaFnc = @(dataPoints) solveCameraEquation(data,systemParams);
 distFcn = @(theta,dataPoints) comparePixels(theta,data,systemParams);
-[thetaSolve, inlierIdx] = ransac(data,fitThetaFnc,distFcn,8,100);
+[thetaSolve, inlierIdx] = ransac(data,fitThetaFnc,distFcn,8,75);
 inlierIdx
 %% results
 alpha = thetaSolve(1); beta = thetaSolve(2); gamma = thetaSolve(3);
@@ -66,8 +66,8 @@ function thetaSolve = solveCameraEquation(dataPoints,systemParams)
     f = @(theta) simpleCameraFunction(theta,coords,systemParams,[]);
     thetaInit = [0,0,0,0,0,2,4000];
          %  a  b    g   x0  y0   h  fu
-    ub = [  0, 0.2, 0,   0,  1,  5,  7000];
-    lb = [ -0,-0.2, 0,   0, -1, 1,  1000];
+    ub = [  0, 0.2, 0.2,   0,  1,  5,  7000];
+    lb = [ -0,-0.2, -0.2,   0, -1,  1,  1000];
     
     disp('Running Global search')
     problem = createOptimProblem('fmincon','objective',f,'x0',thetaInit,'lb',lb,'ub',ub);

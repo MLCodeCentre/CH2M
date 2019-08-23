@@ -3,12 +3,13 @@ function navFile = fixHeadingsCentralDiff(navFile)
 % positional data of the (i-1)th and (i+1)th image. 
 
 N = 1;
-
 headings = navFile.HEADING;
 XCOORD = navFile.XCOORD;
 YCOORD = navFile.YCOORD;
 % add to start
-headingsCorrected(1:N,1) = headings(1:N);
+headingsCorrected = headings;
+ts = diff(navFile.GPSTIMES);
+ts = [0.1;ts];
 
 nHeadings = size(headings,1);
 for iHeading = N+1:nHeadings-N
@@ -19,12 +20,14 @@ for iHeading = N+1:nHeadings-N
     dx = xPlus1-xMinus1;
     dy = yPlus1-yMinus1;
     headingCorrected = rad2deg(mod(atan2(dx,dy),2*pi));
-    headingsCorrected(end+1,1) = headingCorrected;
+    if ~(abs(ts(iHeading)) > 1 || abs(ts(iHeading-1)) > 1 || abs(ts(iHeading+1)) > 1)
+        headingsCorrected(iHeading) = headingCorrected;
+    else
+        %disp('Large time step')
+        ts(iHeading-1:iHeading+1);
+    end
 end
 
-% add to the end
-headingsCorrected(end:end+N,1) = headings(end-N:end);
-
-navFile.HEADINGCD = headingsCorrected;
+navFile.HEADING = headingsCorrected;
 %plotHeadings(navFile)
 end

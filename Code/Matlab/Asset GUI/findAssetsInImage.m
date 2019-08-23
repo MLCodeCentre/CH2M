@@ -6,14 +6,14 @@ function [assets, pVehicles, assetInfo, assetDimensions] = findAssetsInImage(ass
 %       image: Image metadata [(1,nCols) TABLE].
 %       cameraParams: Parameters of calibrated cameras [STRUCT].
 %   OUTPUTS:
-%       assets: Assets found in the image [(nAssets,nCols) TABLE].
+%       assets: Asset pixels and boxes found in the image [(nAssets,6) ARRAY].
 %       pCameras: The position vector of the assets relative to the camera [(nAssets,3) ARRAY]
 
 % only consider images this far away from the asset
 MIN_X = 5;
 MAX_X = 60;
-MAX_Y = 11;
-BUFFER = 50; % Assets must be this many pixels within the image
+MAX_Y = 10;
+BUFFER = 10; % Assets must be this many pixels within the image
 
 % Initial filter to get only assets near to the photo
 assetLocation = [assets.XCOORD,assets.YCOORD,zeros(size(assets.YCOORD))];
@@ -41,6 +41,7 @@ for iAsset = 1:numAssets
     pWorld = pAssetWorld-pVehicleWorld; % relative position in the world
     % converting the vehicle frame of reference
     pan = image.HEADING;
+    tilt = image.PITCH;
     pVehicle = toVehicleCoords(pWorld,pan,0,0);
     % get bounding box and pixels
     box = getBoundingBox(pVehicle,assetDimension,cameraParams);

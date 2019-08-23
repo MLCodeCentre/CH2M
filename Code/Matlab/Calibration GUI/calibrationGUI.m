@@ -86,7 +86,6 @@ cameraParams = handles.cameraParamTable.UserData;
 assetData = handles.loadAssetData.UserData;
 [assetsImage, pVehicles, assetInfo, assetDimensions]...
     = findAssetsInImage(assetData,image,cameraParams);
-assetDimensions
 assetTypesImage = char(ones(size(assetsImage,1),1) * assetType);
 
 assetTableFields = assetInfo.Properties.VariableNames;
@@ -112,21 +111,21 @@ set(handles.assetTable,'Data',assetTableData,'columnname',assetTableFields)
 axes(handles.axes1);
 plotAllAssets(assetsImage,assetTypesImage,true)
 
-hold on
-U = [];
-V = [];
-z = 0;
-for x = linspace(10,40,10)
-    for y = linspace(-1.8,1.8,10)        
-        [u,v] = getPixelsFromCoords([x,y,z]',cameraParams);
-        U = [U,u];
-        V = [V,v];
-    end
-    plot(U(:),V(:),'bo')
-    hold on
-    U = [];
-    V = [];
-end
+% hold on
+% U = [];
+% V = [];
+% z = 0;
+% for x = linspace(10,40,10)
+%     for y = linspace(-1.8,1.8,10)        
+%         [u,v] = getPixelsFromCoords([x,y,z]',cameraParams);
+%         U = [U,u];
+%         V = [V,v];
+%     end
+%     plot(U(:),V(:),'bo')
+%     hold on
+%     U = [];
+%     V = [];
+% end
 
 
 % --- Executes on selection change in setRoad.
@@ -211,10 +210,8 @@ try
     %navFile = sortrows(navFile,{'PCDATE','PCTIME'});
     navFile.PCDATE = str2double(navFile.PCDATE);
     navFile.PCTIME = str2double(navFile.PCTIME);
-    % update position data
-    navFile = kalmanFilter(navFile);
     % update headings
-    navFile = preProcessNavFile(navFile);
+    navFile = preProcessNavFile(navFile,42,9.3,false);
     % create a struct so that the road has a nav file and the
     % camera parameters for each year.
     navData = struct('navFile',navFile);
@@ -248,12 +245,17 @@ rowInd = find(navFile.PCDATE==PCDATE & navFile.PCTIME == PCTIME);
 
 skip = get(handles.skipslide,'UserData');
 prevImage = navFile(rowInd-skip,:);
-prevImage.fileName{1} = constructFileName(camera,prevImage.PCDATE,prevImage.PCTIME);
+prevImage.fileName = constructFileName(camera,prevImage.PCDATE,prevImage.PCTIME);
 
 % load dataDir and road for the plot
 dataDir = handles.setDataDir.UserData;
 road = handles.setRoad.String{handles.setRoad.Value};
 plotAssetsOnAxes(prevImage,[],[],[],dataDir,road,handles)
+
+%plotting heading and location on axes.
+axes(handles.locationAndHeading)
+cla(handles.locationAndHeading)
+plotCorrectedVehicle(navFile,handles,prevImage.PCDATE,prevImage.PCTIME - 2:prevImage.PCTIME + 2,prevImage.PCTIME)
 
 
 % --- Executes on button press in next.
@@ -267,7 +269,7 @@ rowInd = find(navFile.PCDATE==PCDATE & navFile.PCTIME == PCTIME);
 
 skip = get(handles.skipslide,'UserData');
 nextImage = navFile(rowInd+skip,:);
-nextImage.fileName{1} = constructFileName(camera,nextImage.PCDATE,nextImage.PCTIME);
+nextImage.fileName = constructFileName(camera,nextImage.PCDATE,nextImage.PCTIME);
 
 % load dataDir and road for the plot
 dataDir = handles.setDataDir.UserData;
@@ -277,7 +279,7 @@ plotAssetsOnAxes(nextImage,[],[],[],dataDir,road,handles)
 %plotting heading and location on axes.
 axes(handles.locationAndHeading)
 cla(handles.locationAndHeading)
-plotCorrectedVehicle(navFile,nextImage.PCDATE,nextImage.PCTIME - 2:nextImage.PCTIME + 2,nextImage.PCTIME)
+plotCorrectedVehicle(navFile,handles,nextImage.PCDATE,nextImage.PCTIME - 2:nextImage.PCTIME + 2,nextImage.PCTIME)
 
 
 % --- Executes on button press in load.
@@ -294,7 +296,7 @@ if imageFile ~= 0
     navFile = handles.setRoad.UserData.navFile;
     image = navFile(find(navFile.PCDATE==PCDATE & navFile.PCTIME == PCTIME),:);
     % add the file name and plot on axis. 
-    image.fileName{1} = imageFile;
+    image.fileName = imageFile;
     plotAssetsOnAxes(image,[],[],[],dataDir,road,handles)
     set(handles.axes1,'UserData',imageFile)
 end
@@ -310,8 +312,14 @@ if isempty(image)
     set(handles.imageFile,'String',' ')
 else
     % load image and file_name
-    img = imread(fullfile(dataDir,road,'Images',image.fileName{1}));
-    imgFile = image.fileName{1};
+	try
+        img = imread(fullfile(dataDir,road,'Images',image.fileName));
+        imgFile = image.fileName;
+    catch
+        img = imread(fullfile(dataDir,road,'Images',image.fileName{1}));
+        imgFile = image.fileName{1};
+    end
+    imgFile = image.fileName;
     hold off;
     % load correct image handle, button down function and user data
     h = imshow(img,'Parent',handles.axes1,'InitialMagnification','fit');
@@ -493,7 +501,7 @@ fileName = handles.imageFile.UserData.fileName;
 dataDir = handles.setDataDir.UserData;
 road = handles.setRoad.String{handles.setRoad.Value};
 % add file to observation data and add to calibration table.
-observation{end+1} = fullfile(dataDir,road,'Images',fileName{1});
+observation{end+1} = fullfile(dataDir,road,'Images',fileName);
 oldData = get(handles.observationTable,'Data');
 newData = [oldData; observation];
 set(handles.observationTable,'Data',newData);
@@ -567,7 +575,7 @@ for iAsset = 1:nAssets
    [assetDimensions,assetZ] = getAssetDimensions(asset);
    [image,box,targetPixels] = findClosestImage(navFile,asset,2,assetDimensions,assetZ,cameraParams);
    if ~isempty(image)
-       img = imread(fullfile(dataDir,road,'Images',image.fileName{1}));
+       img = imread(fullfile(dataDir,road,'Images',image.fileName));
        subplot(2,2,iAsset)
        imshow(img); hold on;
        rectangle('Position',box,...

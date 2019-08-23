@@ -12,8 +12,8 @@ f = @(theta) simpleCameraFunction(theta,coords,systemParams,vanishingPoint);
 % initial values and constraints
            % alpha beta  gamma x0  y0    h      f
 thetaInit = [0,     0,     0,   0,   0,   2.5,    5000];
-ub = [       0,   0.2,    0.1, 0,   2,   2.8,    6000];
-lb = [      -0, -0.2,    -0.1, 0,   -2,   2.3,    4000];
+ub = [       0,   0.2,    0.1,  0,   2,   2.8,    8000];
+lb = [      -0, -0.2,    -0.1,  0,  -2,   2.3,    4000];
 % constraint function
 vanishingPoint = [1127,937];
 %nonlcon = @(theta) calibrationConstraints(theta,systemParams,vanishingPoint);
