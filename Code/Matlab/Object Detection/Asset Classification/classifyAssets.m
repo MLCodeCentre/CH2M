@@ -1,9 +1,9 @@
 function uncheckedAssets = classifyAssets(road,year,assetType,net)
 
 % loading images, asset data, nav data and camera parameters
-imageDir = fullfile('F:',year,road,'images');
+imageDir = fullfile('E:\',year,road,'Images');
 %images = dir(fullfile(imageDir,'2*.jpg')); 
-navFile = loadNavFile(fullfile('F:',year,road,'Nav'),road);
+navFile = loadNavFile(fullfile('E:',year,road,'Nav'),road);
 
 % loading the test assets
 assetsTestLoad = load(fullfile('Assets_Test',sprintf('%s_assetsTest.mat',assetType)));
@@ -12,7 +12,7 @@ nAssets = size(assets,1);
 uncheckedAssets = [];
 
 % loading camera parameters
-cameraParamTable = readtable(fullfile(dataDir,road,year,'calibration_parameters.csv'));
+cameraParamTable = readtable(fullfile('E:',year,road,'Calibration','calibration_parameters_simple.csv'));
 cameraParams = table2struct(cameraParamTable);
 
 % labels for each of the prediction indices.
@@ -31,8 +31,9 @@ for iAsset = 1:nAssets
    if ~isempty(image)
        % an image was found:
        results(1,1) = results(1,1) + 1;
+
        % load image and crop asset
-       img = imread(fullfile(imageDir,image.fileName{1}));
+       img = imread(fullfile(imageDir,image.fileName));
        assetCrop = imcrop(img,boxClosest);
        % classify the asset
        preds = predict(net,imresize(assetCrop,[224,224]));

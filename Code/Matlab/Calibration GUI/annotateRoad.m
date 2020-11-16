@@ -4,8 +4,8 @@ function annotateRoad(cameraParams)
 %%  plotting road
 xmax = 48;
 ymax = 6;
-xRange = linspace(10,xmax,11);
-yRange = linspace(-ymax,ymax,2*ymax+1);
+xRange = 10:2:xmax;
+yRange = -ymax:ymax;
 z = 0;
 
 U = []; V = [];

@@ -53,17 +53,12 @@ end
 %% find assets that are actually in the image and are within MIN_X, MAX_X and MAX_Y.
 % getting assets with x between MIN_X and MAX_X
 correctX = pVehicles(:,1) > MIN_X & pVehicles(:,1) < MAX_X;
-pVehicles = pVehicles(correctX,:);
-boxes = boxes(correctX,:);
-pixels = pixels(correctX,:);
-navFile = navFile(correctX,:);
-
-% getting assets with y less than MAX_Y
 correctY = abs(pVehicles(:,2)) < MAX_Y;
-pVehicles = pVehicles(correctY,:);
-boxes = boxes(correctY,:);
-pixels = pixels(correctY,:);
-navFile = navFile(correctY,:);
+
+pVehicles = pVehicles(correctX & correctY,:);
+boxes = boxes(correctX & correctY,:);
+pixels = pixels(correctX & correctY,:);
+navFile = navFile(correctX & correctY,:);
 
 % are boxes in the image
 correctBoxes = boxes(:,1) > BUFFER & boxes(:,1) + boxes(:,3) < cameraParams.m - BUFFER ... 

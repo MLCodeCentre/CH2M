@@ -24,7 +24,7 @@ for iAssetType = 1:nAssetTypes
     assetType = assetTypeInfo{1};
     
     % loading data and looping through
-    assetDbfFolder = fullfile(dataDir,'Assets','Year2_A27_Shapefiles');   
+    assetDbfFolder = fullfile(dataDir,'Inventory');   
     assetDbfFiles = dir(fullfile(assetDbfFolder,['*',assetType,'*.dbf']));
     
     if isempty(assetDbfFiles) == 0

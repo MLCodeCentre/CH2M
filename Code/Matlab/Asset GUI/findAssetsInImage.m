@@ -12,7 +12,7 @@ function [assets, pVehicles, assetInfo, assetDimensions] = findAssetsInImage(ass
 % only consider images this far away from the asset
 MIN_X = 5;
 MAX_X = 60;
-MAX_Y = 10;
+MAX_Y = 20;
 BUFFER = 10; % Assets must be this many pixels within the image
 
 % Initial filter to get only assets near to the photo
@@ -51,6 +51,7 @@ for iAsset = 1:numAssets
     pixels = [pixels; u,v];
     assetDimensions = [assetDimensions;assetDimension];
 end
+
 
 %% find assets that are actually in the image and are within MIN_X, MAX_X and MAX_Y.
 if size(pVehicles,1) > 0

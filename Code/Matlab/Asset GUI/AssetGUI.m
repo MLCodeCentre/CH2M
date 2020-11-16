@@ -238,7 +238,7 @@ road = handles.setRoad.String{handles.setRoad.Value};
 
 try
     % load navFiles
-    navFile = loadNavFile(fullfile(dataDir,road,'Nav'),road); 
+    navFile = loadNavFile(dataDir,road); 
     % create a struct so that the road has a nav file and the
     % camera parameters for each year.
     navData = struct('navFile',navFile);
@@ -446,11 +446,12 @@ dataDir = handles.setDataDir.UserData;
 road = handles.setRoad.String{handles.setRoad.Value};
 assetTypes = handles.selectAssetType.String;
 cameraParams = handles.setRoad.UserData.cameraParams;
+year = 'Year2';
 
 % find all assets in year 1 image if loaded
 if isempty(image) == 0
     [assetsImage,assetTypesImage] = ...
-        findAllAssets(image,assetTypes,dataDir,cameraParams);
+        findAllAssets(image,assetTypes,fullfile(dataDir,road),cameraParams);
     % plot all of those assets
     axes(handles.surveyImage);
     set(handles.surveyImage,'NextPlot','add')
@@ -524,8 +525,9 @@ nextImage.fileName{1} = constructFileName(camera,nextImage.PCDATE,nextImage.PCTI
 % load dataDir and road for the plot
 dataDir = handles.setDataDir.UserData;
 road = handles.setRoad.String{handles.setRoad.Value};
-plotAssetsOnAxes(nextImage,[],[],[],dataDir,handles)
+plotAssetsOnAxes(nextImage,[],[],[],dataDir,road,handles)
 
+ 
 
 % --- Executes on button press in prevYear2.
 function prevYear2_Callback(hObject, eventdata, handles)
@@ -666,8 +668,8 @@ if isempty(image)
     set(handles.year1File,'String',' ')
 else
     % load image and file_name
-    img = imread(fullfile(dataDir,road,'Images',image.fileName{1}));
-    imgFile = image.fileName{1};
+    img = imread(fullfile(dataDir,road,'Images',image.fileName));
+    imgFile = image.fileName;
     hold off;
 
     h = imshow(img,'Parent',handles.surveyImage,'InitialMagnification','fit');

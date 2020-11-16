@@ -25,6 +25,7 @@ cameraParamTable = readtable(fullfile(dataDir,road,'Calibration',...
 'camera_parameters.csv'));
 cameraParams = table2struct(cameraParamTable);
 
+assetsTrain = assetDataTable(str2double(assetDataTable.SOURCE_ID) == 3000009435,:)
 imsaveInd = 1200;
 %outDir = 'C:/CH2MData';
 % looping through the images and pulling out all testing images. 
@@ -38,6 +39,8 @@ while imsaveInd < 1300
         % find assets
         [assets, Pcs, assetInfo] = findAssetsInImage(assetsTrain,imageNav,...
             cameraParams);
+        
+        
         % assets = n * [u,v,u_box,v_box,w_box,h_box]
         nAssets = size(assets,1);
         if nAssets > 0       

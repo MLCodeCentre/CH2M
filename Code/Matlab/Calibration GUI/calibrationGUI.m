@@ -86,6 +86,7 @@ cameraParams = handles.cameraParamTable.UserData;
 assetData = handles.loadAssetData.UserData;
 [assetsImage, pVehicles, assetInfo, assetDimensions]...
     = findAssetsInImage(assetData,image,cameraParams);
+pVehicles
 assetTypesImage = char(ones(size(assetsImage,1),1) * assetType);
 
 assetTableFields = assetInfo.Properties.VariableNames;
@@ -211,7 +212,7 @@ try
     navFile.PCDATE = str2double(navFile.PCDATE);
     navFile.PCTIME = str2double(navFile.PCTIME);
     % update headings
-    navFile = preProcessNavFile(navFile,42,9.3,false);
+    navFile = preProcessNavFile(navFile,road,1,0.3,false,false);
     % create a struct so that the road has a nav file and the
     % camera parameters for each year.
     navData = struct('navFile',navFile);

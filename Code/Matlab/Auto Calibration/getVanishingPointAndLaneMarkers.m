@@ -8,14 +8,14 @@ roiImg = getROI(rgbImg,500,1200);
 imshow(roiImg)
 
 % edge detection
-subplot(1,2,1)
-edgesImg = edgeDetection(roiImg);
-imshow(edgesImg)
+% subplot(1,2,1)
+% edgesImg = edgeDetection();
+% imshow(edgesImg)
 
 % line extraction by hough transform
-[H,theta,rho] = hough(edgesImg);
+[H,theta,rho] = hough(rgb2gray(roiImg));
 peaks = houghpeaks(H,500,'threshold',ceil(0.3*max(H(:))));
-lines = houghlines(edgesImg,theta,rho,peaks,'FillGap',100,'MinLength',3);
+lines = houghlines(rgb2gray(roiImg),theta,rho,peaks,'FillGap',100,'MinLength',3);
 
 % finding vanishing point from longest lines on each side
 subplot(1,2,2)
@@ -30,8 +30,8 @@ end
 function blurImg = edgeDetection(rgbImg)
     % using a simple thresholding on grey scale to find road marking
     grayImg = rgb2gray(rgbImg);
-    %grayFilt = imbinarize(grayImg,0.85);
-    grayFilt = grayImg > 230;
+    grayFilt = imbinarize(grayImg,0.5);
+    %grayFilt = grayImg > 230;
     maskedGrayImg = bsxfun(@times, grayImg, cast(grayFilt, 'like', grayImg));
     edgesImg = maskedGrayImg;
     blurImg = imgaussfilt(edgesImg,3);

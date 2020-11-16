@@ -10,12 +10,13 @@ nNav = size(navFile,1);
 whiteRatio = []; % classifcation labels stored here. 
 cameraParams = loadCameraParams(road);% loading camera params to crop asset out of images
 for iNav = 1:nNav
+    ydist = [];
     if show_plot
         figure;
     end
     %fprintf('%d/%d\n',iAsset,nAssets)
     image = navFile(iNav,:);
-    assetsImage = findAssetsInImage(assets,image,cameraParams);
+    [assetsImage,pVehicles] = findAssetsInImage(assets,image,cameraParams);
     %figure;
     % select image from navFile and find asset
     % crop image    
@@ -25,12 +26,12 @@ for iNav = 1:nNav
         img = imgSet{iNav};
         assetCrop = imcrop(img,box);
         if show_plot
-            imshow(assetCrop)
+            imshow(assetCrop);
         end
         assetCropFlat = assetCrop(:);
         % NEW PLAN MOST WHITE IN CROP THIS WILL SPEED THINGS UP!
         %imshow(assetCrop)
-        whiteRatio(end+1) = sum(assetCropFlat > 230)/numel(assetCropFlat);
+        whiteRatio(end+1) = sum(assetCropFlat > 200)/numel(assetCropFlat);
     end
 end
 accuracy = mean(whiteRatio);

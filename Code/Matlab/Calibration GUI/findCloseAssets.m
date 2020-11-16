@@ -1,7 +1,7 @@
 function [assets,pVehicles,assetDimensions] = findCloseAssets(assets,image)
 
-MIN_X = 5;
-MAX_X = 80;
+MIN_X = 30;
+MAX_X = 50;
 MAX_Y = 10;
 
 % Initial filter to get only assets near to the photo

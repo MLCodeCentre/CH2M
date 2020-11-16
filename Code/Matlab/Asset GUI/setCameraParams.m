@@ -8,5 +8,5 @@ function cameraParams = setCameraParams(dataDir,road)
 %       cameraParams: Loaded camera parameters [STRUCT]
 
 % reading parameters from disk
-paramTable = readtable(fullfile(dataDir,road,'Calibration','camera_parameters.csv'));
+paramTable = readtable(fullfile(dataDir,road,'Calibration','calibration_parameters_simple.csv'));
 cameraParams = table2struct(paramTable);

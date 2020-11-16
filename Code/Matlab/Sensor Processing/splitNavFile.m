@@ -7,15 +7,21 @@ if showPlot
     figure; hold on; % new fig for plotting;
 end
 
-TIME_THRESH = 10; % section breaks are time steps longer than 1 TIME_THRESH. 
+DIST_THRESH = 5; % section breaks are time steps longer than 1 TIME_THRESH. 
 ts = [0.1; diff(navFile.GPSTIMES)]; % time steps - guessing the first. 
 % create sections
 navFileSections = {};
 sectionStartInd = 1;
 nNav = size(navFile,1);
 
+xs = [0;diff(navFile.XCOORD)];
+ys = [0;diff(navFile.YCOORD)];
+
+dist = sqrt(xs.^2 + ys.^2);
+
 for iNav = 1:nNav
-    if abs(ts(iNav)) > TIME_THRESH
+    
+    if dist(iNav) > DIST_THRESH
         if iNav == nNav
             navFileSection = navFile(sectionStartInd:iNav,:);
         else
@@ -23,7 +29,8 @@ for iNav = 1:nNav
         end
         navFileSections{end+1} = navFileSection; % add to section        
         if showPlot
-            scatter(navFileSection.XCOORD,navFileSection.YCOORD,'.')
+            figure;
+            scatter(navFileSection.XCOORD,navFileSection.YCOORD,'.');
         end
         sectionStartInd = iNav; % this is the start of the next section
     end

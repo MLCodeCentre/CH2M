@@ -2,12 +2,15 @@ function findTuningAssets(assets,navFile,road)
 
 %assetIDs = {'7000007052','7000007022','7000006865'};
 %assetIDs = {'7002000304','7002000305','7002000635','7002000922'};
- assetIDs = {'7000004812','7000005109','7000004808','7000004807','7000005086',...
-             '7000005296','7000005446','7000005447'}; % MKRF
+%  assetIDs = {'7000004812','7000005109','7000004808','7000004807','7000005086',...
+%              '7000005296','7000005446','7000005447'}; % MKRF
 %assetIDs = {'7000000616','7000000795','7000000258','7002000531','7002001047'};
+%assetIDs = {'7000006865'};
+% MKRFs on straight roads.
+assetIDs = {'7002001216','7002001217','7000001145','7000001165','7000001342'};
 assets = assets(ismember(assets.SOURCE_ID,assetIDs),:);
 classifySeqLength = 10;
-filterSeqLength = 40;
+filterSeqLength = 50;
 
 tuningAssets = [];
 navFileFilter = [];
@@ -25,7 +28,7 @@ for iAsset = 1:nAssets
        navFileFilter = [navFileFilter;navFileFilterSequence];
        
        navFileClassifySequence = navFile(navFile.PCDATE==PCDATE & ...
-           ismember(navFile.PCTIME,PCTIME-classifySeqLength:PCTIME-2),:);
+           ismember(navFile.PCTIME,PCTIME-classifySeqLength:PCTIME),:);
        navFileClassify = [navFileClassify;navFileClassifySequence];
 
        tuningAssets = [tuningAssets;asset];

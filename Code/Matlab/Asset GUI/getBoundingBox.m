@@ -9,8 +9,8 @@ function box = getBoundingBox(assetPosition,assetDimensions,cameraParams)
 
 % if width and height aren't provided then 1m for each is assumed. 
 % allow a small error buffer for asset X,Y and Z.
-BUFFER = 0.1;
-BUFFER_Z = 0.1;
+BUFFER = 0.3;
+BUFFER_Z = 0.3;
 
 % unpack asset Position and Dimensions
 assetX = assetPosition(1); assetY = assetPosition(2); assetZ = assetPosition(3);

@@ -35,7 +35,8 @@ else
    x0 = cameraParams(4); y0 = cameraParams(5); h = cameraParams(6);
    fu = cameraParams(7); fv = cameraParams(8); 
    cu = cameraParams(9); cv = cameraParams(10);
-   m = cameraParams(11); n = cameraParams(12);
+   %m = cameraParams(11); n = cameraParams(12);
+   m = 2464; n = 2056;
    p1 = 0; k1 = 0; 
 end
 
@@ -50,9 +51,10 @@ T = [x0, y0, h]';
 Xw = coordinates; % X in the world
 Xc = R*Xw - T; % X relative to the camera
 
+
 % converting to pixels
-uDist = fu*Xc(2)/Xc(1) + cu; % this is from the centre of the image
-vDist = fv*Xc(3)/Xc(1) + cv;
+uDist = fu*Xc(2)/Xc(1); % this is from the centre of the image
+vDist = fv*Xc(3)/Xc(1);
 
 % distortions
 r = sqrt((uDist-cu)^2 + (vDist-cv)^2);
@@ -60,5 +62,5 @@ uUndist = uDist + (uDist-cu)*(k1*r^2) + p1*((r^2 + 2*(uDist-cu)^2));
 vUndist = vDist + (vDist-cv)*(k1*r^2) + 2*p1*(vDist-cv)*(uDist-cu);
 
 % transforming coordinate system to top left
-u = uUndist + m/2; 
-v = -vUndist + n/2;
+u = uDist + m/2; 
+v = -vDist + n/2;
